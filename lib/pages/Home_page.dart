@@ -100,15 +100,18 @@ class _HomePageState extends State<HomePage> {
       ),
       //Drawer
       drawer: Drawer(
-        backgroundColor: Color.fromARGB(255, 153, 150, 150),
+        backgroundColor: const Color.fromARGB(255, 52, 52, 52),
         child: Column(
           children: [
             DrawerHeader(
-              child: Icon(Icons.tag_faces_sharp),
+              child: Icon(
+                Icons.tag_faces_sharp,
+                color: Colors.white,
+              ),
             ),
             ListTile(
-              leading: Icon(Icons.face),
-              title: Text('PROFILE'),
+              leading: Icon(Icons.face, color: Colors.white),
+              title: Text('PROFILE', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -116,8 +119,8 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('SETTINGS'),
+              leading: Icon(Icons.settings, color: Colors.white),
+              title: Text('SETTINGS', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => SettingPage()),
@@ -125,8 +128,11 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.help),
-              title: Text('HELP'),
+              leading: Icon(Icons.help, color: Colors.white),
+              title: Text(
+                'HELP',
+                style: TextStyle(color: Colors.white),
+              ),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => HelpPage()),
@@ -134,8 +140,8 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('LOGOUT'),
+              leading: Icon(Icons.logout, color: Colors.white),
+              title: Text('LOGOUT', style: TextStyle(color: Colors.white)),
               onTap: () {
                 signUserout();
               },
