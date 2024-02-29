@@ -1,9 +1,11 @@
+import 'package:application/components/note_editor.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class NoteReaderScreen extends StatefulWidget {
-  NoteReaderScreen(this.doc, {super.key});
-  QueryDocumentSnapshot doc;
+  final QueryDocumentSnapshot doc;
+
+  NoteReaderScreen(this.doc, {Key? key}) : super(key: key);
 
   @override
   State<NoteReaderScreen> createState() => _NoteReaderScreenState();
@@ -17,6 +19,17 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(0xFA, 0xFF, 0xD8, 1),
         elevation: 0.0,
+        title: Text(widget.doc['note_title']),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: _updateNote,
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: _deleteNote,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(17.0),
@@ -42,11 +55,60 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
             Text(
               widget.doc['note_content'],
               style: const TextStyle(fontWeight: FontWeight.normal),
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _updateNote() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NoteEditorScreen(
+          noteTitle: widget.doc['note_title'],
+          creationDate: widget.doc['creation_date'],
+          noteContent: widget.doc['note_content'],
+          noteId: widget.doc.id,
+        ),
+      ),
+    );
+  }
+
+  void _deleteNote() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Note"),
+          content: Text("Are you sure you want to delete this note?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Delete"),
+              onPressed: () {
+                FirebaseFirestore.instance
+                    .collection("Notes")
+                    .doc(widget.doc.id)
+                    .delete()
+                    .then((value) {
+                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(
+                      context); // Navigate back to the previous screen
+                }).catchError((error) {
+                  print("Failed to delete note: $error");
+                });
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

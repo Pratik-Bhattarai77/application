@@ -2,16 +2,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class NoteEditorScreen extends StatefulWidget {
-  const NoteEditorScreen({super.key});
+  final String noteTitle;
+  final String creationDate;
+  final String noteContent;
+  final String noteId;
+
+  const NoteEditorScreen({
+    Key? key,
+    this.noteTitle = '',
+    this.creationDate = '',
+    this.noteContent = '',
+    this.noteId = '',
+  }) : super(key: key);
 
   @override
   State<NoteEditorScreen> createState() => _NoteEditorScreenState();
 }
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
-  String date = DateTime.now().toString();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _maincontent = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = widget.noteTitle;
+    _maincontent.text = widget.noteContent;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +37,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(0xFA, 0xFF, 0xD8, 1),
         elevation: 0.0,
-        title: const Text("Add a new Note"),
+        title: const Text("Edit Note"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(17.0),
@@ -39,7 +56,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               height: 8.0,
             ),
             Text(
-              date,
+              widget.creationDate,
               style: const TextStyle(
                   fontWeight: FontWeight.normal,
                   color: Color.fromARGB(255, 83, 83, 83)),
@@ -63,15 +80,23 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 241, 241, 241),
         onPressed: () async {
-          FirebaseFirestore.instance.collection("Notes").add({
-            "note_title": _titleController.text,
-            "creation_date": date,
-            "note_content": _maincontent.text,
-          }).then((value) {
-            print(value.id);
-            Navigator.pop(context);
-          }).catchError(
-              (error) => print("Faild to add new Thoughts due to $error "));
+          if (widget.noteId.isNotEmpty) {
+            await FirebaseFirestore.instance
+                .collection("Notes")
+                .doc(widget.noteId)
+                .update({
+              "note_title": _titleController.text,
+              "creation_date": widget.creationDate,
+              "note_content": _maincontent.text,
+            });
+          } else {
+            await FirebaseFirestore.instance.collection("Notes").add({
+              "note_title": _titleController.text,
+              "creation_date": DateTime.now().toString(),
+              "note_content": _maincontent.text,
+            });
+          }
+          Navigator.pop(context);
         },
         child: const Icon(Icons.save),
       ),
