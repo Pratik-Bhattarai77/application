@@ -77,7 +77,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const Text(
                   'Lets Create an Account',
                   style: TextStyle(
-                    color: Color.fromARGB(255, 94, 94, 94),
+                    color: Color.fromARGB(255, 94, 93, 94),
                     fontSize: 16,
                   ),
                 ),
