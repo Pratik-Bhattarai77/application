@@ -86,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: const Color.fromARGB(255, 219, 218, 218),
       body: SafeArea(
         child: SingleChildScrollView(
-          // Wrap with SingleChildScrollView
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
