@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:application/components/my_button.dart';
 import 'package:application/components/my_textfield.dart';
 import 'package:application/components/square_tile.dart';
+import 'package:application/pages/password.reset.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -79,6 +80,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void navigateToPasswordReset() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Password()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,15 +124,19 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 118, 117, 117),
+                      GestureDetector(
+                        onTap: navigateToPasswordReset,
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 33, 155, 255),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],

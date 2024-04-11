@@ -86,7 +86,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 .doc(widget.noteId)
                 .update({
               "note_title": _titleController.text,
-              "creation_date": widget.creationDate,
               "note_content": _maincontent.text,
             });
           } else {
@@ -96,7 +95,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               "note_content": _maincontent.text,
             });
           }
-          Navigator.pop(context);
+          Navigator.pop(
+              context, 'updated'); // Return a result to indicate success
         },
         child: const Icon(Icons.save),
       ),

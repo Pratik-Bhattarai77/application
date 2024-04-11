@@ -12,6 +12,14 @@ class NoteReaderScreen extends StatefulWidget {
 }
 
 class _NoteReaderScreenState extends State<NoteReaderScreen> {
+  Map<String, dynamic>? noteData;
+
+  @override
+  void initState() {
+    super.initState();
+    noteData = widget.doc.data() as Map<String, dynamic>;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +27,7 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(0xFA, 0xFF, 0xD8, 1),
         elevation: 0.0,
-        title: Text(widget.doc['note_title']),
+        title: Text(noteData?['note_title'] ?? ''),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.edit),
@@ -37,14 +45,14 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.doc['note_title'],
+              noteData?['note_title'] ?? '',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             const SizedBox(
               height: 4.0,
             ),
             Text(
-              widget.doc['creation_date'],
+              noteData?['creation_date'] ?? '',
               style: const TextStyle(
                   fontWeight: FontWeight.normal,
                   color: Color.fromARGB(255, 83, 83, 83)),
@@ -53,7 +61,7 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
               height: 28.0,
             ),
             Text(
-              widget.doc['note_content'],
+              noteData?['note_content'] ?? '',
               style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ],
@@ -67,13 +75,17 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => NoteEditorScreen(
-          noteTitle: widget.doc['note_title'],
-          creationDate: widget.doc['creation_date'],
-          noteContent: widget.doc['note_content'],
+          noteTitle: noteData?['note_title'] ?? '',
+          creationDate: noteData?['creation_date'] ?? '',
+          noteContent: noteData?['note_content'] ?? '',
           noteId: widget.doc.id,
         ),
       ),
-    );
+    ).then((result) {
+      if (result == 'updated') {
+        _refreshNote();
+      }
+    });
   }
 
   void _deleteNote() {
@@ -110,5 +122,21 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
         );
       },
     );
+  }
+
+  void _refreshNote() {
+    FirebaseFirestore.instance
+        .collection("Notes")
+        .doc(widget.doc.id)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        setState(() {
+          noteData = documentSnapshot.data() as Map<String, dynamic>;
+        });
+      } else {
+        print("Note does not exist");
+      }
+    });
   }
 }
