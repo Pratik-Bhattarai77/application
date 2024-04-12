@@ -25,20 +25,67 @@ class _PasswordState extends State<Password> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            content: Text("Password reset link sent! Check your email"),
+            backgroundColor: Theme.of(context)
+                .dialogBackgroundColor, // Use theme's dialog background color
+            title: Center(
+              child: Text(
+                'Success',
+                style: TextStyle(
+                    color: Color.fromARGB(
+                        255, 23, 23, 23)), // Assuming white text for clarity
+              ),
+            ),
+            content: Text(
+              "Password reset link sent! Check your email",
+              style: TextStyle(
+                  color: const Color.fromARGB(
+                      255, 30, 30, 30)), // Assuming white text for clarity
+            ),
           );
         },
       );
     } on FirebaseAuthException catch (e) {
-      print(e);
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text(e.message.toString()),
-          );
-        },
-      );
+      if (e.code == 'invalid-email') {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: Theme.of(context)
+                  .dialogBackgroundColor, // Use theme's dialog background color
+              content: Text(
+                "Incorrect Email",
+                style: TextStyle(
+                    color: const Color.fromARGB(
+                        255, 38, 38, 38)), // Assuming white text for clarity
+              ),
+            );
+          },
+        );
+      } else {
+        print(e);
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: Theme.of(context)
+                  .dialogBackgroundColor, // Use theme's dialog background color
+              title: Center(
+                child: Text(
+                  'Validation Error',
+                  style: TextStyle(
+                      color: Colors.white), // Assuming white text for clarity
+                ),
+              ),
+              content: Text(
+                e.message.toString(),
+                style: TextStyle(
+                    color: const Color.fromARGB(
+                        255, 39, 39, 39)), // Assuming white text for clarity
+              ),
+            );
+          },
+        );
+      }
     }
   }
 

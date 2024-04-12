@@ -21,6 +21,28 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   void signUserIn() async {
+    // Check if email or password is empty
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Validation Error'),
+            content: Text('Please insert your E-mail and password.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return; // Exit the method if validation fails
+    }
+
     showDialog(
       context: context,
       builder: (context) {
@@ -38,43 +60,25 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
-      if (e.code == 'user-not-found') {
-        wrongEmailMessage();
-      } else if (e.code == 'wrong-password') {
-        wrongPasswordMessage();
-      }
+      showValidationErrorDialog(e.code);
     }
   }
 
-  void wrongEmailMessage() {
+  void showValidationErrorDialog(String code) {
     showDialog(
       context: context,
       builder: (context) {
-        return const AlertDialog(
-          backgroundColor: Color.fromARGB(255, 106, 60, 185),
-          title: Center(
-            child: Text(
-              'Incorrect Email',
-              style: TextStyle(color: Color.fromARGB(255, 240, 239, 239)),
+        return AlertDialog(
+          title: Text('Validation Error'),
+          content: Text('Incorrect email or password.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  void wrongPasswordMessage() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const AlertDialog(
-          backgroundColor: Colors.deepPurple,
-          title: Center(
-            child: Text(
-              'Incorrect Password',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
+          ],
         );
       },
     );
