@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:application/components/my_registerbutton.dart';
 import 'package:application/components/my_textfield.dart';
@@ -53,16 +55,25 @@ class _RegisterPageState extends State<RegisterPage> {
         child: CircularProgressIndicator(),
       ),
     );
-
+    //create user
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: usernameController.text, password: passwordController.text);
-
+          email: usernameController.text.trim(),
+          password: passwordController.text.trim());
+      //user details
+      addUserdetails(
+          fullnameController.text.trim(), usernameController.text.trim());
       if (context.mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       displayMessage(e.message ?? 'An error occurred. Please try again.');
     }
+  }
+
+  Future addUserdetails(String fullname, String email) async {
+    await FirebaseFirestore.instance
+        .collection("User")
+        .add({"Full name": fullname, "email": email});
   }
 
   void displayMessage(String message) {
@@ -135,7 +146,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 25),
                 MyTextField(
-                  controller: usernameController,
+                  controller: fullnameController,
                   hintText: 'Full Name',
                   obscureText: false,
                 ),
