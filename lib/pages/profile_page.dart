@@ -9,7 +9,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final User currentUser = FirebaseAuth.instance.currentUser!;
+  final currentUser = FirebaseAuth.instance.currentUser!;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +41,14 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: Colors.transparent,
             ),
           ),
+          SizedBox(height: 20),
+          //user email
+          Text(
+            currentUser.email!,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white),
+          ),
+          //username
         ],
       ),
     );
