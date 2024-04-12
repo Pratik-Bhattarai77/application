@@ -14,8 +14,16 @@ class _RegisterPageState extends State<RegisterPage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final fullnameController = TextEditingController();
+
+  @override
+  void dispose() {
+    fullnameController.dispose();
+    super.dispose();
+  }
+
   // sign user in method
-  void signUserIn() async {
+  Future signUserIn() async {
     // Regex pattern for email validation
     final RegExp emailRegex = RegExp(r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+');
 
@@ -126,6 +134,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 25),
+                MyTextField(
+                  controller: usernameController,
+                  hintText: 'Full Name',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 10),
                 MyTextField(
                   controller: usernameController,
                   hintText: 'Email',
