@@ -16,6 +16,29 @@ class _RegisterPageState extends State<RegisterPage> {
   final confirmPasswordController = TextEditingController();
   // sign user in method
   void signUserIn() async {
+    // Regex pattern for email validation
+    final RegExp emailRegex = RegExp(r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+');
+
+    // Check if any field is empty
+    if (usernameController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
+      displayMessage("Please fill in all fields.");
+      return; // Exit the method if validation fails
+    }
+
+    // Check if passwords match
+    if (passwordController.text != confirmPasswordController.text) {
+      displayMessage("Passwords do not match.");
+      return; // Exit the method if validation fails
+    }
+
+    // Validate email format
+    if (!emailRegex.hasMatch(usernameController.text)) {
+      displayMessage("Please enter a valid email address.");
+      return; // Exit the method if email format is invalid
+    }
+
     showDialog(
       context: context,
       builder: (context) => const Center(
@@ -23,27 +46,14 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
 
-    // make sure password match
-    if (passwordController.text != confirmPasswordController.text) {
-      //pop loading circle
-      Navigator.pop(context);
-
-      //show error
-      displayMessage("Password Don't match");
-      return;
-    }
-
-    //try creating user
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: usernameController.text, password: passwordController.text);
 
       if (context.mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
-      //pop loading circle
       Navigator.pop(context);
-      // Show error to user
-      displayMessage(e.code);
+      displayMessage(e.message ?? 'An error occurred. Please try again.');
     }
   }
 
@@ -51,7 +61,41 @@ class _RegisterPageState extends State<RegisterPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(message),
+        backgroundColor: Theme.of(context)
+            .dialogBackgroundColor, // Consistent with app theme
+        title: Center(
+          child: Text(
+            'Alert!!',
+            style: TextStyle(
+              color: Theme.of(context)
+                  .textTheme
+                  .headline6
+                  ?.color, // Consistent text color
+            ),
+          ),
+        ),
+        content: Text(
+          message,
+          textAlign: TextAlign.center, // Center the content text
+          style: TextStyle(
+            color: Theme.of(context)
+                .textTheme
+                .bodyText1
+                ?.color, // Consistent text color
+            fontSize: 18, // Increase font size to 18
+          ),
+        ),
+        actions: <Widget>[
+          Align(
+            alignment: Alignment.center,
+            child: TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
