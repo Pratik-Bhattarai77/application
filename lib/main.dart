@@ -1,7 +1,8 @@
 import 'package:application/pages/Auth_page.dart';
+import 'package:application/pages/payment_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:khalti_flutter/khalti_flutter.dart'; // Import Khalti package
+import 'package:khalti_flutter/khalti_flutter.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           navigatorKey: navKey,
           home: const AuthPage(),
+          // home: const Payment(),
         );
       },
     );

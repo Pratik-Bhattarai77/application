@@ -138,7 +138,7 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const SizedBox(height: 50),
                 const Icon(
-                  Icons.lock,
+                  Icons.account_circle,
                   size: 100,
                 ),
                 const SizedBox(height: 50),
