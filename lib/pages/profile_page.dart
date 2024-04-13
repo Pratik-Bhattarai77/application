@@ -10,12 +10,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final currentUser = FirebaseAuth.instance.currentUser!;
-
-// Future<String> getFullName(String userId) async {
-//  DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('User').doc(userId).get();
-//  return userDoc['Full name'];
-// }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

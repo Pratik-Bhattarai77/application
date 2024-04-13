@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NoteEditorScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class NoteEditorScreen extends StatefulWidget {
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _maincontent = TextEditingController();
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -32,6 +34,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (currentUser == null) {
+      // Handle the case where there is no current user.
+      // For example, show an error message or redirect to a sign-in screen.
+      return Scaffold(
+        body: Center(
+          child: Text('Please sign in to edit notes.'),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0xFA, 0xFF, 0xD8, 1),
       appBar: AppBar(
@@ -82,14 +94,20 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         onPressed: () async {
           if (widget.noteId.isNotEmpty) {
             await FirebaseFirestore.instance
+                .collection("User")
+                .doc(currentUser!.uid)
                 .collection("Notes")
-                .doc(widget.noteId)
+                .doc(widget.noteId) // Specify the document ID to update
                 .update({
               "note_title": _titleController.text,
               "note_content": _maincontent.text,
             });
           } else {
-            await FirebaseFirestore.instance.collection("Notes").add({
+            await FirebaseFirestore.instance
+                .collection("User")
+                .doc(currentUser!.uid)
+                .collection("Notes")
+                .add({
               "note_title": _titleController.text,
               "creation_date": DateTime.now().toString(),
               "note_content": _maincontent.text,

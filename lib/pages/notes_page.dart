@@ -2,6 +2,7 @@ import 'package:application/components/note_card.dart';
 import 'package:application/components/note_editor.dart';
 import 'package:application/components/note_reader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,6 +14,8 @@ class NotePage extends StatefulWidget {
 }
 
 class _NotePageState extends State<NotePage> {
+  final currentUser = FirebaseAuth.instance.currentUser!;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,8 +39,11 @@ class _NotePageState extends State<NotePage> {
             ),
             Expanded(
                 child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection("Notes").snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection("User")
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .collection("Notes")
+                  .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -46,8 +52,9 @@ class _NotePageState extends State<NotePage> {
                 }
                 if (snapshot.hasData) {
                   return GridView(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2),
                     children: snapshot.data!.docs
                         .map((note) => noteCard(() {
                               Navigator.push(
@@ -61,7 +68,7 @@ class _NotePageState extends State<NotePage> {
                   );
                 }
                 return Text(
-                  "their's no Notes",
+                  "There's no Notes",
                   style: GoogleFonts.poppins(
                       color: const Color.fromARGB(255, 240, 239, 236)),
                 );
@@ -73,8 +80,10 @@ class _NotePageState extends State<NotePage> {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color.fromARGB(255, 241, 241, 241),
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const NoteEditorScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const NoteEditorScreen()));
         },
         label: const Text("Add Notes"),
         icon: const Icon(Icons.add),

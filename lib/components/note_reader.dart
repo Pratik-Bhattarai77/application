@@ -1,5 +1,6 @@
 import 'package:application/components/note_editor.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NoteReaderScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class NoteReaderScreen extends StatefulWidget {
 
 class _NoteReaderScreenState extends State<NoteReaderScreen> {
   Map<String, dynamic>? noteData;
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -106,6 +108,8 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
               child: Text("Delete"),
               onPressed: () {
                 FirebaseFirestore.instance
+                    .collection("User")
+                    .doc(currentUser?.uid ?? '')
                     .collection("Notes")
                     .doc(widget.doc.id)
                     .delete()
@@ -126,6 +130,8 @@ class _NoteReaderScreenState extends State<NoteReaderScreen> {
 
   void _refreshNote() {
     FirebaseFirestore.instance
+        .collection("User")
+        .doc(currentUser?.uid ?? '')
         .collection("Notes")
         .doc(widget.doc.id)
         .get()

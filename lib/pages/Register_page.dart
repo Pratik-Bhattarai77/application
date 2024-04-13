@@ -54,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
         child: CircularProgressIndicator(),
       ),
     );
-    //create user
+
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: usernameController.text.trim(),
@@ -62,10 +62,16 @@ class _RegisterPageState extends State<RegisterPage> {
       //user details
       addUserdetails(
           fullnameController.text.trim(), usernameController.text.trim());
-      if (context.mounted) Navigator.pop(context);
+      if (mounted) {
+        // Check if the widget is still mounted
+        Navigator.pop(context);
+      }
     } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      displayMessage(e.message ?? 'An error occurred. Please try again.');
+      if (mounted) {
+        // Check if the widget is still mounted
+        Navigator.pop(context);
+        displayMessage(e.message ?? 'An error occurred. Please try again.');
+      }
     }
   }
 
