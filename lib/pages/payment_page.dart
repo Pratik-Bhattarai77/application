@@ -58,7 +58,7 @@ class _PaymentState extends State<Payment> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
-      color: Color.fromARGB(255, 191, 191, 191), // Darker card color
+      color: Color.fromARGB(255, 85, 84, 84), // Darker card color
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -81,8 +81,8 @@ class _PaymentState extends State<Payment> {
               Container(
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors
-                      .black, // Black background for the textual content and button
+                  color: Color.fromARGB(255, 48, 48,
+                      48), // Black background for the textual content and button
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(

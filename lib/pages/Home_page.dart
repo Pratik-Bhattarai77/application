@@ -1,3 +1,4 @@
+import 'package:application/pages/book_info.dart';
 import 'package:application/pages/libary_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -241,14 +242,22 @@ class _HomeContentState extends State<HomeContent> {
                 items: myitems.map((item) {
                   return Builder(
                     builder: (BuildContext context) {
-                      return Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              15.0), // Adjust the radius as needed
-                          image: DecorationImage(
-                            image: AssetImage(item),
-                            fit: BoxFit.cover,
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => BookInfoPage()),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 5.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                15.0), // Adjust the radius as needed
+                            image: DecorationImage(
+                              image: AssetImage(item),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       );

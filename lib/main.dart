@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           navigatorKey: navKey,
           home: const AuthPage(),
-          // home: const Payment(),
+          //home: const Payment(),
         );
       },
     );
