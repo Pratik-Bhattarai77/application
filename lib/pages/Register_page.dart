@@ -1,3 +1,4 @@
+import 'package:application/pages/login_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -64,12 +65,14 @@ class _RegisterPageState extends State<RegisterPage> {
           fullnameController.text.trim(), usernameController.text.trim());
       if (mounted) {
         // Check if the widget is still mounted
-        Navigator.pop(context);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+              builder: (context) => LoginPage(onTap: widget.onTap)),
+        );
+        ;
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
-        // Check if the widget is still mounted
-        // Navigator.pop(context);
         displayMessage(e.message ?? 'An error occurred. Please try again.');
       }
     }
