@@ -19,9 +19,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return KhaltiScope(
-      publicKey:
-          'test_public_key_b4a66361b76b4349bcfca4e30e8789f6', // Replace with your actual public key
-      enabledDebugging: false, // Set to false in production
+      publicKey: 'test_public_key_b4a66361b76b4349bcfca4e30e8789f6',
+      enabledDebugging: false,
       builder: (context, navKey) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
