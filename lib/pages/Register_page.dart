@@ -69,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         // Check if the widget is still mounted
-        Navigator.pop(context);
+        // Navigator.pop(context);
         displayMessage(e.message ?? 'An error occurred. Please try again.');
       }
     }
@@ -175,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 10),
                 const SizedBox(height: 25),
-                MyButton(
+                MyButtonR(
                   onTap: signUserIn,
                   text: 'Sign Up',
                 ),

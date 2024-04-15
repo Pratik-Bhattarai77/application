@@ -8,8 +8,6 @@ import 'package:application/pages/password.reset.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
-
-  // Remove unnecessary super.key parameter from the constructor
   const LoginPage({super.key, required this.onTap});
 
   @override
@@ -19,8 +17,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool _isLoading = false; // State variable to track loading state
 
   Future<void> signUserIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       if (mounted) {
         showDialog(
@@ -41,6 +44,9 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
       }
+      setState(() {
+        _isLoading = false;
+      });
       return; // Exit the method if validation fails
     }
 
@@ -50,6 +56,9 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text,
       );
       // Sign-in successful
+      setState(() {
+        _isLoading = false;
+      });
     } on FirebaseAuthException {
       // Handle sign-in error
       if (mounted) {
@@ -71,27 +80,10 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
       }
+      setState(() {
+        _isLoading = false;
+      });
     }
-  }
-
-  void showValidationErrorDialog(String code) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Validation Error'),
-          content: Text('Incorrect email or password.'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void navigateToPasswordReset() {
@@ -165,8 +157,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 25),
                 MyButton(
-                  onTap: signUserIn,
-                  text: 'Sign in',
+                  onTap: _isLoading ? null : signUserIn,
+                  text: _isLoading ? 'Loading...' : 'Sign in',
+                  child: _isLoading ? CircularProgressIndicator() : null,
                 ),
                 const SizedBox(height: 50),
                 const Padding(
