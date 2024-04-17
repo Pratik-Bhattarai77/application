@@ -11,35 +11,34 @@ class Payment extends StatefulWidget {
 class _PaymentState extends State<Payment> {
   @override
   Widget build(BuildContext context) {
+    final double aspectRatio = 16 / 9;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double imageHeight = screenWidth / aspectRatio;
+
     return Scaffold(
       backgroundColor:
           Color.fromARGB(255, 60, 59, 59), // Black Scaffold background
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
           children: <Widget>[
+            // Logo placed outside the card, full width
+            Image.asset(
+              'lib/images/books.png', // Path to your logo image
+              width: screenWidth, // Full width
+              height: imageHeight, // Adjusted height based on aspect ratio
+              fit: BoxFit.cover,
+            ),
+            SizedBox(height: 80.0),
             _buildSubscriptionCard(
               title: 'Monthly Subscription',
               description: 'Access to all books for a month',
               price: '1000 NPR',
-              animationPath:
-                  'lib/images/good.json', // Use animation path instead of image path
+              animationPath: 'lib/images/good.json',
               onTap: () {
                 // Placeholder for initiating payment
               },
             ),
-            SizedBox(height: 16.0),
-            _buildSubscriptionCard(
-              title: 'Annual Subscription',
-              description: 'Access to all books for a year',
-              price: '12000 NPR',
-              animationPath:
-                  'lib/images/good.json', // Use animation path instead of image path
-              onTap: () {
-                // Placeholder for initiating payment
-              },
-            ),
-            // Add more subscription options as needed
           ],
         ),
       ),
@@ -77,7 +76,6 @@ class _PaymentState extends State<Payment> {
                 ),
               ),
               SizedBox(height: 16.0),
-              // Container for the textual content and the "Subscribe" button with black background
               Container(
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -114,8 +112,6 @@ class _PaymentState extends State<Payment> {
                       ),
                     ),
                     SizedBox(height: 8.0),
-                    // "Subscribe" button inside the black-background container
-                    // Inside the _buildSubscriptionCard method, where the "Subscribe" button is defined
                     Align(
                       alignment: Alignment.center,
                       child: ElevatedButton(
