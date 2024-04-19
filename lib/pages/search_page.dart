@@ -31,7 +31,10 @@ class _SearchPageState extends State<SearchPage> {
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        return List<dynamic>.from(data['items']);
+        return List<dynamic>.from(data['items'].map((item) => {
+              ...item,
+              'hasPdfView': item['accessInfo']?['pdf']?['isAvailable'] ?? false,
+            }));
       } else {
         throw Exception(
             'Failed to load data. Status code: ${response.statusCode}');
@@ -91,6 +94,8 @@ class _SearchPageState extends State<SearchPage> {
                     volumeInfo['authors']?.join(', ') ?? 'Unknown Author';
                 var imageUrl = volumeInfo['imageLinks']?['thumbnail'];
                 var previewLink = volumeInfo['previewLink'];
+                var hasPdfView =
+                    item['hasPdfView']; // Extract the hasPdfView field
 
                 return Card(
                   margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -109,7 +114,15 @@ class _SearchPageState extends State<SearchPage> {
                         : null,
                     title: Text(title,
                         style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(authors),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(authors),
+                        Text(hasPdfView
+                            ? 'PDF View Available'
+                            : 'PDF View Not Available'),
+                      ],
+                    ),
                     onTap: () {
                       _openPreviewLink(previewLink);
                     },
