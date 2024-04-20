@@ -1,0 +1,51 @@
+class Book {
+ final String title;
+ final List<String> authors;
+ final String publishedDate;
+ final String description;
+ final List<IndustryIdentifier> industryIdentifiers;
+ final bool epubAvailable;
+ final bool pdfAvailable;
+
+ Book({
+    required this.title,
+    required this.authors,
+    required this.publishedDate,
+    required this.description,
+    required this.industryIdentifiers,
+    required this.epubAvailable,
+    required this.pdfAvailable,
+ });
+
+ factory Book.fromJson(Map<String, dynamic> json) {
+    var volumeInfo = json['volumeInfo'];
+    var accessInfo = json['accessInfo'];
+    var industryIdentifiers = (volumeInfo['industryIdentifiers'] as List)
+        .map((i) => IndustryIdentifier.fromJson(i))
+        .toList();
+
+    return Book(
+      title: volumeInfo['title'],
+      authors: List<String>.from(volumeInfo['authors']),
+      publishedDate: volumeInfo['publishedDate'],
+      description: volumeInfo['description'],
+      industryIdentifiers: industryIdentifiers,
+      epubAvailable: accessInfo['epub']['isAvailable'],
+      pdfAvailable: accessInfo['pdf']['isAvailable'],
+    );
+ }
+}
+
+class IndustryIdentifier {
+ final String type;
+ final String identifier;
+
+ IndustryIdentifier({required this.type, required this.identifier});
+
+ factory IndustryIdentifier.fromJson(Map<String, dynamic> json) {
+    return IndustryIdentifier(
+      type: json['type'],
+      identifier: json['identifier'],
+    );
+ }
+}

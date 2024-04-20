@@ -33,28 +33,17 @@ class _BookInfoPageState extends State<BookInfoPage> {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10),
-          Text(
-            'Cherry Curtis',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
           SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.star, color: Colors.yellow),
-              Icon(Icons.star, color: Colors.yellow),
-              Icon(Icons.star, color: Colors.yellow),
-              Icon(Icons.star, color: Colors.yellow),
-              Icon(Icons.star_half, color: Colors.yellow),
-            ],
           ),
           SizedBox(height: 40),
 
           ElevatedButton(
             onPressed: () {
-              print('Add to Library button pressed');
+              print('Read');
             },
-            child: Text('Add to Library'),
+            child: Text('Read'),
             style: ElevatedButton.styleFrom(
               primary: Colors.orange,
               onPrimary: Colors.white,
