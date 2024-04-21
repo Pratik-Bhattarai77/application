@@ -1,4 +1,4 @@
-import 'package:application/pages/login_page.dart';
+import 'package:application/components/my_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -65,14 +65,12 @@ class _RegisterPageState extends State<RegisterPage> {
           fullnameController.text.trim(), usernameController.text.trim());
       if (mounted) {
         // Check if the widget is still mounted
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-              builder: (context) => LoginPage(onTap: widget.onTap)),
-        );
-        ;
+        Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
+        // Check if the widget is still mounted
+        Navigator.pop(context);
         displayMessage(e.message ?? 'An error occurred. Please try again.');
       }
     }
@@ -141,7 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const SizedBox(height: 50),
                 const Icon(
-                  Icons.account_circle,
+                  Icons.lock,
                   size: 100,
                 ),
                 const SizedBox(height: 50),
@@ -178,7 +176,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 10),
                 const SizedBox(height: 25),
-                MyButtonR(
+                MyButton(
                   onTap: signUserIn,
                   text: 'Sign Up',
                 ),
