@@ -20,7 +20,6 @@ class _BookInfoPageState extends State<BookInfoPage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          // Image of the book cover
           Image.asset(
             'lib/images/Rectangle 62.png',
             width: 200,
@@ -38,10 +37,16 @@ class _BookInfoPageState extends State<BookInfoPage> {
             mainAxisAlignment: MainAxisAlignment.center,
           ),
           SizedBox(height: 40),
-
           ElevatedButton(
             onPressed: () {
               print('Read');
+              // Navigator.push(
+              //                 context,
+              //                 MaterialPageRoute(
+              //                   builder: (context) =>
+              //                       PDFViewerPage(pdfUrl: pdfUrl),
+              //                 ),
+              //               );
             },
             child: Text('Read'),
             style: ElevatedButton.styleFrom(
