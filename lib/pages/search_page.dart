@@ -131,8 +131,10 @@ class _SearchPageState extends State<SearchPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    PDFViewerPage(pdfUrl: pdfUrl),
+                                builder: (context) => PDFViewerPage(
+                                  pdfUrl: pdfUrl,
+                                  bookTitle: 'tittle',
+                                ),
                               ),
                             );
                           },
