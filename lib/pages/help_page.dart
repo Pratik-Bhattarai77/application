@@ -62,10 +62,6 @@ class HelpPage extends StatelessWidget {
                       'Head over to our Help Center and read articles about how to use Wattpad, or check out our Known Issues page to see what bugs we\'re currently working on fixing.',
                     ),
                     _buildDivider(),
-                    _buildHelpItem(
-                      'Chat with our Virtual Helper',
-                      'Want quick answers? Our Virtual Helper is the fastest way to get information on anything related to Wattpad.',
-                    ),
                     _buildDivider(),
                     _buildHelpItem(
                       'Submit a Support Ticket',
@@ -74,7 +70,7 @@ class HelpPage extends StatelessWidget {
                     _buildDivider(),
                     _buildHelpItem(
                       'Shake for Help',
-                      'Get to the Help Center from anywhere in the app.',
+                      'Reach out to us via Helpbook@gmail.com.',
                     ),
                   ],
                 ),

@@ -120,15 +120,6 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings, color: Colors.white),
-              title: Text('SETTINGS', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => SettingPage()),
-                );
-              },
-            ),
-            ListTile(
               leading: Icon(Icons.help, color: Colors.white),
               title: Text(
                 'HELP',
