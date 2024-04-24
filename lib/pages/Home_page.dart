@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:application/pages/book_info.dart';
 import 'package:application/pages/libary_page.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +14,7 @@ import 'package:application/pages/notes_page.dart';
 import 'package:application/pages/profile_page.dart';
 import 'package:application/pages/search_page.dart';
 import 'package:application/pages/setting_page.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomePage extends StatefulWidget {
@@ -161,121 +167,53 @@ class _HomePageState extends State<HomePage> {
 
 // Home page extended to mkae UI more efficent
 class HomeContent extends StatefulWidget {
-  HomeContent({Key? key});
+  HomeContent({Key? key}) : super(key: key);
 
   @override
-  State<HomeContent> createState() => _HomeContentState();
+  _HomeContentState createState() => _HomeContentState();
 }
 
 class _HomeContentState extends State<HomeContent> {
-  final myitems = [
-    'lib/images/slide2.png',
-    'lib/images/slide3.png',
-    'lib/images/slide1.png',
-  ];
-
-  int myCurrentIndex = 0;
-
-  final List<String> yourImageList = [
-    'lib/images/Rectangle 60.png',
-    'lib/images/Rectangle 61.png',
-    'lib/images/Rectangle 62.png',
-    // Add more image paths as needed
-  ];
-  final List<String> ImageList = [
-    'lib/images/Rectangle 63.png',
-    'lib/images/Rectangle 64.png',
-    'lib/images/Rectangle 65.png',
-    // Add more image paths as needed
-  ];
-
-  final List<String> yourTitles = [
-    'The Exorcist',
-    'Jungle book',
-    'Moon Love',
-    'The Girl who Drank The Moon',
-    'The Physcholgy of Money',
-    'John Wick',
-    // Add more titles as needed
-  ];
-
-  final List<String> Titles = [
-    'The Girl..',
-    'The Physcholgy..',
-    'John Wick',
-    // Add more titles as needed
-  ];
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 52, 52, 52),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(top: 20.0),
-          child: Column(
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('User')
+            .doc('pOUxhmtf3E6I0e3jM0vG') // Use the actual document ID
+            .collection('books')
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text('No books found'),
+            );
+          }
+
+          // Split the books into two sections
+          List<DocumentSnapshot> firstHalf = snapshot.data!.docs
+              .take(snapshot.data!.docs.length ~/ 2)
+              .toList();
+          List<DocumentSnapshot> secondHalf = snapshot.data!.docs
+              .skip(snapshot.data!.docs.length ~/ 2)
+              .toList();
+
+          return Column(
             children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  autoPlay: true,
-                  height: 250,
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  autoPlayInterval: const Duration(seconds: 2),
-                  enlargeCenterPage: true,
-                  aspectRatio: 2.0,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      myCurrentIndex = index;
-                    });
-                  },
-                ),
-                items: myitems.map((item) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => BookInfoPage()),
-                          );
-                        },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 5.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                                15.0), // Adjust the radius as needed
-                            image: DecorationImage(
-                              image: AssetImage(item),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              AnimatedSmoothIndicator(
-                activeIndex: myCurrentIndex,
-                count: myitems.length,
-                effect: WormEffect(
-                  dotHeight: 8,
-                  dotWidth: 8,
-                  spacing: 10,
-                  dotColor: Colors.grey.shade200,
-                  activeDotColor: Color.fromARGB(255, 0, 0, 0),
-                  paintStyle: PaintingStyle.fill,
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
+              // const SizedBox(height: 100),
               Padding(
-                padding: EdgeInsets.only(left: 30.0),
+                padding: EdgeInsets.only(left: 20.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -283,79 +221,185 @@ class _HomeContentState extends State<HomeContent> {
                       'Top Picks',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 25.0,
+                        fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 10.0),
-              Container(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: yourImageList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            yourImageList[index],
-                            height: 120,
-                            width: 120,
-                            fit: BoxFit.contain,
+              // First horizontal section
+              Expanded(
+                child: Container(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: firstHalf.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> data =
+                          firstHalf[index].data() as Map<String, dynamic>;
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Container(
+                          width: 150, // Adjust the width as needed
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Card(
+                                color: Color.fromARGB(255, 30, 30, 30),
+                                margin: const EdgeInsets.all(16.0),
+                                child: CachedNetworkImage(
+                                  imageUrl: data['image'] ?? '',
+                                  placeholder: (context, url) =>
+                                      CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
+                                  fit: BoxFit.cover,
+                                  height: 160,
+                                  width: 150,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Display the tittle  below the image and outside the card
+                              Container(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  data['tittle'] ?? '',
+                                  style: TextStyle(
+                                    fontSize:
+                                        12, // Adjust the font size as needed
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            yourTitles[index],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-              SizedBox(height: 1.0),
-              Container(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: ImageList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            ImageList[index],
-                            height: 120,
-                            width: 120,
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            Titles[index],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ],
+              const SizedBox(height: 25),
+              // Second horizontal section
+              Padding(
+                padding: EdgeInsets.only(left: 30.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      'For you ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  },
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 200, // Adjust the height as needed
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: secondHalf.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> data =
+                          secondHalf[index].data() as Map<String, dynamic>;
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          width: 150, // Adjust the width as needed
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Card(
+                                color: Color.fromARGB(255, 30, 30, 30),
+                                margin: const EdgeInsets.all(16.0),
+                                child: CachedNetworkImage(
+                                  imageUrl: data['image'] ?? '',
+                                  placeholder: (context, url) =>
+                                      CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
+                                  fit: BoxFit.cover,
+                                  height: 160,
+                                  width: 150,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  data['tittle'] ?? '',
+                                  style: TextStyle(
+                                    fontSize:
+                                        12, // Adjust the font size as needed
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
+  }
+}
+
+Future<String?> _fetchPdfUrl(String pdfName) async {
+  try {
+    final ref = FirebaseStorage.instance.ref();
+    var childref = ref.child('book1/I Will Kill The Author c1-141.pdf');
+    return await childref.getDownloadURL();
+  } on FirebaseException catch (e) {
+    print("Failed with error '${e.code}': ${e.message}");
+    return null;
+  }
+}
+
+Future<String?> _downloadPDF(String pdfUrl) async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/book.pdf');
+    await FirebaseStorage.instance.refFromURL(pdfUrl).writeToFile(file);
+    print('PDF downloaded to ${file.path}');
+    return file.path;
+  } catch (e) {
+    print('Error downloading PDF: $e');
+    return null;
   }
 }
