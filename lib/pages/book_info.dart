@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:application/main.dart';
 import 'package:application/pages/pdf_viewer_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,14 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:path_provider/path_provider.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
-  runApp(MyApp());
-}
-
 class BookInfoPage extends StatefulWidget {
-  const BookInfoPage({Key? key}) : super(key: key);
+  const BookInfoPage({Key? key, required bookId}) : super(key: key);
 
   @override
   State<BookInfoPage> createState() => _BookInfoPageState();
@@ -89,8 +82,8 @@ class _BookInfoPageState extends State<BookInfoPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5.0),
                                   border: Border.all(
-                                    color: Colors.white, // Border color
-                                    width: 2, // Border width
+                                    color: Colors.white,
+                                    width: 2,
                                   ),
                                   image: DecorationImage(
                                     image: imageProvider,

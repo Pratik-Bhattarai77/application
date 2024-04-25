@@ -174,7 +174,11 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
-  String? _errorMessage;
+  final myitems = [
+    'lib/images/slide2.png',
+    'lib/images/slide3.png',
+    'lib/images/slide1.png',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +215,45 @@ class _HomeContentState extends State<HomeContent> {
 
           return Column(
             children: [
-              // const SizedBox(height: 100),
+              CarouselSlider(
+                options: CarouselOptions(
+                  height: 180,
+                  autoPlay: true,
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                  autoPlayInterval: const Duration(seconds: 2),
+                  enlargeCenterPage: true,
+                  aspectRatio: 2.0,
+                  onPageChanged: (index, reason) {},
+                ),
+                items: myitems.map((item) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => BookInfoPage(
+                                      bookId: null,
+                                    )),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 5.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15.0),
+                            image: DecorationImage(
+                              image: AssetImage(item),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 10.0),
               Padding(
                 padding: EdgeInsets.only(left: 20.0),
                 child: Row(
@@ -228,24 +270,30 @@ class _HomeContentState extends State<HomeContent> {
                   ],
                 ),
               ),
-              // First horizontal section
               Expanded(
-                child: Container(
-                  height: 100,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: firstHalf.length,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> data =
-                          firstHalf[index].data() as Map<String, dynamic>;
-                      return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Container(
-                          width: 150, // Adjust the width as needed
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Card(
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: firstHalf.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> data =
+                        firstHalf[index].data() as Map<String, dynamic>;
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Container(
+                        width: 150,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        BookInfoPage(bookId: data['bookId']),
+                                  ),
+                                );
+                              },
+                              child: Card(
                                 color: Color.fromARGB(255, 30, 30, 30),
                                 margin: const EdgeInsets.all(16.0),
                                 child: CachedNetworkImage(
@@ -255,8 +303,8 @@ class _HomeContentState extends State<HomeContent> {
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                   fit: BoxFit.cover,
-                                  height: 160,
-                                  width: 150,
+                                  height: 130,
+                                  width: 100,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
                                     decoration: BoxDecoration(
@@ -269,31 +317,27 @@ class _HomeContentState extends State<HomeContent> {
                                   ),
                                 ),
                               ),
-                              // Display the tittle  below the image and outside the card
-                              Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  data['tittle'] ?? '',
-                                  style: TextStyle(
-                                    fontSize:
-                                        12, // Adjust the font size as needed
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  textAlign: TextAlign.center,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                data['tittle'] ?? '',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 25),
-              // Second horizontal section
               Padding(
                 padding: EdgeInsets.only(left: 30.0),
                 child: Row(
@@ -311,22 +355,30 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ),
               Expanded(
-                child: Container(
-                  height: 200, // Adjust the height as needed
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: secondHalf.length,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> data =
-                          secondHalf[index].data() as Map<String, dynamic>;
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Container(
-                          width: 150, // Adjust the width as needed
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Card(
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: secondHalf.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> data =
+                        secondHalf[index].data() as Map<String, dynamic>;
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        width: 150, // Adjust the width as needed
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => BookInfoPage(
+                                        bookId: data[
+                                            'bookId']), // Pass the book's ID or any other necessary data
+                                  ),
+                                );
+                              },
+                              child: Card(
                                 color: Color.fromARGB(255, 30, 30, 30),
                                 margin: const EdgeInsets.all(16.0),
                                 child: CachedNetworkImage(
@@ -336,8 +388,8 @@ class _HomeContentState extends State<HomeContent> {
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                   fit: BoxFit.cover,
-                                  height: 160,
-                                  width: 150,
+                                  height: 130,
+                                  width: 100,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
                                     decoration: BoxDecoration(
@@ -350,26 +402,26 @@ class _HomeContentState extends State<HomeContent> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  data['tittle'] ?? '',
-                                  style: TextStyle(
-                                    fontSize:
-                                        12, // Adjust the font size as needed
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  textAlign: TextAlign.center,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                data['tittle'] ?? '',
+                                style: TextStyle(
+                                  fontSize:
+                                      12, // Adjust the font size as needed
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
