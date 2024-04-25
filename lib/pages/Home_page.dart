@@ -255,7 +255,7 @@ class _HomeContentState extends State<HomeContent> {
               ),
               SizedBox(height: 10.0),
               Padding(
-                padding: EdgeInsets.only(left: 20.0),
+                padding: EdgeInsets.only(left: 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -278,7 +278,7 @@ class _HomeContentState extends State<HomeContent> {
                     Map<String, dynamic> data =
                         firstHalf[index].data() as Map<String, dynamic>;
                     return Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(10),
                       child: Container(
                         width: 150,
                         child: Column(
@@ -303,7 +303,7 @@ class _HomeContentState extends State<HomeContent> {
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                   fit: BoxFit.cover,
-                                  height: 130,
+                                  height: 140,
                                   width: 100,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
@@ -339,7 +339,7 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 30.0),
+                padding: EdgeInsets.only(left: 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -362,9 +362,9 @@ class _HomeContentState extends State<HomeContent> {
                     Map<String, dynamic> data =
                         secondHalf[index].data() as Map<String, dynamic>;
                     return Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Container(
-                        width: 150, // Adjust the width as needed
+                        width: 150,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -380,7 +380,7 @@ class _HomeContentState extends State<HomeContent> {
                               },
                               child: Card(
                                 color: Color.fromARGB(255, 30, 30, 30),
-                                margin: const EdgeInsets.all(16.0),
+                                margin: const EdgeInsets.all(10.0),
                                 child: CachedNetworkImage(
                                   imageUrl: data['image'] ?? '',
                                   placeholder: (context, url) =>
@@ -388,7 +388,7 @@ class _HomeContentState extends State<HomeContent> {
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                   fit: BoxFit.cover,
-                                  height: 130,
+                                  height: 140,
                                   width: 100,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(

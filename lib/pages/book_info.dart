@@ -9,7 +9,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:path_provider/path_provider.dart';
 
 class BookInfoPage extends StatefulWidget {
-  const BookInfoPage({Key? key, required bookId}) : super(key: key);
+  final String? bookId;
+  const BookInfoPage({Key? key, this.bookId}) : super(key: key);
 
   @override
   State<BookInfoPage> createState() => _BookInfoPageState();
@@ -31,7 +32,7 @@ class _BookInfoPageState extends State<BookInfoPage> {
           color: Colors.white,
         ),
       ),
-      backgroundColor: Color.fromARGB(255, 94, 94, 94),
+      backgroundColor: const Color.fromARGB(255, 52, 52, 52),
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('User')
@@ -58,97 +59,107 @@ class _BookInfoPageState extends State<BookInfoPage> {
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 Map<String, dynamic> data =
                     document.data() as Map<String, dynamic>;
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    color: Color.fromARGB(255, 30, 30, 30),
-                    margin: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl: data['image'] ?? '',
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
-                              fit: BoxFit.cover,
-                              height: 140,
-                              width: 120,
-                              imageBuilder: (context, imageProvider) =>
-                                  Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
-                                  ),
-                                  image: DecorationImage(
-                                    image: imageProvider,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Card(
+                        color: Color(0xFFFFEDD3),
+                        margin: const EdgeInsets.all(16.0),
+                        child: CachedNetworkImage(
+                          imageUrl: data['image'] ?? '',
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                          fit: BoxFit.cover,
+                          height: 170,
+                          width: 130,
+                          imageBuilder: (context, imageProvider) => Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5.0),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2,
+                              ),
+                              image: DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        width: 340, // Set the width
+                        height: 180, // Set the height
+                        child: Card(
+                          color: Color(0xFFFFEDD3),
+                          margin: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment
+                                .start, // Align children to the start (left)
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(10.0),
                                 child: Text(
                                   data['tittle'] ?? '', // Corrected typo
                                   style: TextStyle(
-                                      fontSize: 24,
+                                      fontSize: 25,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      color:
+                                          const Color.fromARGB(255, 6, 6, 6)),
+                                  textAlign: TextAlign
+                                      .left, // Ensure text is left-aligned
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final pdfUrl = data[
-                                'pdf']; // Directly use the pdf URL from Firestore
-                            if (pdfUrl == null) {
-                              setState(() {
-                                _errorMessage = 'PDF URL is null';
-                              });
-                              return;
-                            }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PDFViewerPage(
-                                  pdfUrl: pdfUrl,
-                                  bookTitle: data['title'] ??
-                                      '', // Pass the correct title
+                              SizedBox(
+                                  height:
+                                      35.0), // Add some space between the title and the button
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final pdfUrl = data['pdf'];
+                                  if (pdfUrl == null) {
+                                    setState(() {
+                                      _errorMessage = 'PDF URL is null';
+                                    });
+                                    return;
+                                  }
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PDFViewerPage(
+                                        pdfUrl: pdfUrl,
+                                        bookTitle: data['tittle'] ?? '',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text('Read book'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: const Color.fromARGB(255, 0, 0, 0),
+                                  onPrimary: Colors.white,
                                 ),
                               ),
-                            );
-                          },
-                          child: Text('Read book'),
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.orange,
-                            onPrimary: Colors.white,
+                            ],
                           ),
                         ),
-                        if (_errorMessage != null)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              _errorMessage!,
-                              style: TextStyle(color: Colors.red),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
-                  ),
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                  ],
                 );
               }).toList(),
             );
