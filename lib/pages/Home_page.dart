@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
               ),
               GButton(
                 icon: Icons.search,
-                text: "Search",
+                text: "All",
               ),
             ],
             selectedIndex: _selectedIndex,

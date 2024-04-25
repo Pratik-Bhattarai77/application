@@ -106,13 +106,12 @@ class _BookInfoPageState extends State<BookInfoPage> {
                               Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: Text(
-                                  data['tittle'] ?? '', // Corrected typo
+                                  data['tittle'] ?? '',
                                   style: TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
                                       overflow: TextOverflow.ellipsis,
-                                      color:
-                                          const Color.fromARGB(255, 6, 6, 6)),
+                                      color: Color.fromARGB(255, 0, 0, 0)),
                                   textAlign: TextAlign
                                       .left, // Ensure text is left-aligned
                                 ),
