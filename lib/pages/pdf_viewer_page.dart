@@ -43,10 +43,21 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
             child: ListView.builder(
               itemCount: notes.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(notes[index]['Hilight Note']),
-                  subtitle: Text(notes[index]['content']),
-                );
+                // Display the book title only once, at the top of the list
+                if (index == 0) {
+                  return ListTile(
+                    title: Text(widget.bookTitle,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20)),
+                    subtitle: Text(notes[index]['content'],
+                        textAlign: TextAlign.justify),
+                  );
+                } else {
+                  return ListTile(
+                    title: Text(notes[index]['content'],
+                        textAlign: TextAlign.justify),
+                  );
+                }
               },
             ),
           ),
@@ -55,15 +66,13 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (selectedText != null && selectedText!.isNotEmpty) {
-            String formattedText =
-                selectedText!.split('\n').map((line) => '- $line').join('\n');
+            String formattedText = selectedText!;
             notes.add({
               'Hilight Note': widget.bookTitle,
               'content': formattedText,
             });
             setState(() {});
           }
-          ;
         },
         child: Icon(Icons.save),
       ),
