@@ -16,10 +16,46 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   String? _errorMessage;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 52, 52, 52),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(0, 0, 0, 0),
+                  borderRadius: BorderRadius.circular(55),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    fillColor: Color.fromARGB(255, 147, 146, 146),
+                    hintText: "Search books...",
+                    border: InputBorder.none,
+                    prefixIcon: Icon(Icons.search),
+                    filled: true,
+                    contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+                  ),
+                  onChanged: (value) {
+                    // Trigger the search when the text changes
+                    setState(() {});
+                  },
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+        titleSpacing: 0,
+        automaticallyImplyLeading: false,
+      ),
       backgroundColor: const Color.fromARGB(255, 52, 52, 52),
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
@@ -43,8 +79,22 @@ class _SearchPageState extends State<SearchPage> {
               );
             }
 
+            // Filter the books based on the search query
+            List<DocumentSnapshot> filteredDocs = [];
+            if (_searchController.text.isNotEmpty) {
+              filteredDocs = snapshot.data!.docs.where((doc) {
+                // Check if the book title contains the search query
+                return doc['tittle']
+                    .toString()
+                    .toLowerCase()
+                    .contains(_searchController.text.toLowerCase());
+              }).toList();
+            } else {
+              filteredDocs = snapshot.data!.docs;
+            }
+
             return ListView(
-              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              children: filteredDocs.map((DocumentSnapshot document) {
                 Map<String, dynamic> data =
                     document.data() as Map<String, dynamic>;
                 return Padding(
