@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class PDFViewerPage extends StatefulWidget {
   final String pdfUrl;
@@ -15,6 +18,50 @@ class PDFViewerPage extends StatefulWidget {
 class _PDFViewerPageState extends State<PDFViewerPage> {
   String? selectedText;
   List<Map<String, dynamic>> notes = [];
+  late FlutterTts flutterTts;
+  String? speakingText;
+  bool isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    flutterTts = FlutterTts();
+    flutterTts.setStartHandler(() {
+      setState(() {
+        isPlaying = true;
+      });
+    });
+
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        isPlaying = false;
+      });
+    });
+
+    flutterTts.setErrorHandler((msg) {
+      setState(() {
+        isPlaying = false;
+      });
+    });
+  }
+
+  Future _speak(String text) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setVoice({"name": "Karen", "locale": "en-AU"});
+    await flutterTts.setSpeechRate(1.0);
+    await flutterTts.setVolume(1.0);
+    await flutterTts.setSpeechRate(Platform.isAndroid ? 0.6 : 0.395);
+    await flutterTts.awaitSpeakCompletion(true);
+    await flutterTts.speak(text);
+  }
+
+  Future _stop() async {
+    await flutterTts.stop();
+  }
+
+  Future _pause() async {
+    await flutterTts.pause();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +72,24 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.play_arrow),
+            onPressed: () {
+              if (speakingText != null) {
+                _speak(speakingText!);
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.pause),
+            onPressed: _pause,
+          ),
+          IconButton(
+            icon: Icon(Icons.stop),
+            onPressed: _stop,
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -35,6 +100,8 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
               onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
                 setState(() {
                   selectedText = details.selectedText;
+                  speakingText = details
+                      .selectedText; // Assign selected text to speakingText
                 });
               },
             ),
