@@ -1,5 +1,3 @@
-// search_page.dart
-
 import 'dart:io';
 import 'package:application/pages/pdf_viewer_page.dart';
 import 'package:flutter/material.dart';
@@ -114,7 +112,7 @@ class _SearchPageState extends State<SearchPage> {
                               errorWidget: (context, url, error) =>
                                   Icon(Icons.error),
                               fit: BoxFit.cover,
-                              height: 140,
+                              height: 160,
                               width: 120,
                               imageBuilder: (context, imageProvider) =>
                                   Container(

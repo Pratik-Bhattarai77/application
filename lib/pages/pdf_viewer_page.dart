@@ -46,13 +46,19 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   }
 
   Future _speak(String text) async {
-    await flutterTts.setLanguage("en-US");
-    await flutterTts.setVoice({"name": "Karen", "locale": "en-AU"});
-    await flutterTts.setSpeechRate(1.0);
-    await flutterTts.setVolume(1.0);
-    await flutterTts.setSpeechRate(Platform.isAndroid ? 0.6 : 0.395);
-    await flutterTts.awaitSpeakCompletion(true);
-    await flutterTts.speak(text);
+    try {
+      await flutterTts.setLanguage("en-US");
+      await flutterTts.setVoice({"name": "Karen", "locale": "en-AU"});
+      await flutterTts.setSpeechRate(1.0);
+      await flutterTts.setVolume(50.0);
+      await flutterTts.setSpeechRate(Platform.isAndroid ? 0.6 : 0.395);
+      await flutterTts.awaitSpeakCompletion(true);
+      await flutterTts.speak(text);
+    } catch (e) {
+      print('Error setting voice: $e');
+      await flutterTts.setVoice({"name": "Default", "locale": "en-US"});
+      await flutterTts.speak(text);
+    }
   }
 
   Future _stop() async {
@@ -80,10 +86,6 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
                 _speak(speakingText!);
               }
             },
-          ),
-          IconButton(
-            icon: Icon(Icons.pause),
-            onPressed: _pause,
           ),
           IconButton(
             icon: Icon(Icons.stop),

@@ -35,8 +35,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   Widget build(BuildContext context) {
     if (currentUser == null) {
-      // Handle the case where there is no current user.
-      // For example, show an error message or redirect to a sign-in screen.
       return Scaffold(
         body: Center(
           child: Text('Please sign in to edit notes.'),

@@ -117,8 +117,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.face, color: Colors.white),
-              title: Text('PROFILE', style: TextStyle(color: Colors.white)),
+              leading: Icon(Icons.settings, color: Colors.white),
+              title: Text('SETTING', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -187,7 +187,7 @@ class _HomeContentState extends State<HomeContent> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('User')
-            .doc('pOUxhmtf3E6I0e3jM0vG') // Use the actual document ID
+            .doc('pOUxhmtf3E6I0e3jM0vG')
             .collection('books')
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -231,11 +231,9 @@ class _HomeContentState extends State<HomeContent> {
                     builder: (BuildContext context) {
                       return GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => BookInfoPage(
-                                      bookId: null,
-                                    )),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Navigating to Book Info Page')),
                           );
                         },
                         child: Container(
@@ -253,14 +251,14 @@ class _HomeContentState extends State<HomeContent> {
                   );
                 }).toList(),
               ),
-              SizedBox(height: 10.0),
+              SizedBox(height: 20.0),
               Padding(
                 padding: EdgeInsets.only(left: 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      'Top Picks',
+                      'For you ',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20.0,
@@ -277,6 +275,7 @@ class _HomeContentState extends State<HomeContent> {
                   itemBuilder: (context, index) {
                     Map<String, dynamic> data =
                         firstHalf[index].data() as Map<String, dynamic>;
+                    print('Book data: $data');
                     return Padding(
                       padding: const EdgeInsets.all(10),
                       child: Container(
@@ -303,7 +302,7 @@ class _HomeContentState extends State<HomeContent> {
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                   fit: BoxFit.cover,
-                                  height: 140,
+                                  height: 150,
                                   width: 100,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
@@ -338,22 +337,6 @@ class _HomeContentState extends State<HomeContent> {
                   },
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      'For you ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               Expanded(
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -372,9 +355,8 @@ class _HomeContentState extends State<HomeContent> {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => BookInfoPage(
-                                        bookId: data[
-                                            'bookId']), // Pass the book's ID or any other necessary data
+                                    builder: (context) =>
+                                        BookInfoPage(bookId: data['bookId']),
                                   ),
                                 );
                               },
@@ -388,7 +370,7 @@ class _HomeContentState extends State<HomeContent> {
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                   fit: BoxFit.cover,
-                                  height: 140,
+                                  height: 160,
                                   width: 100,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
@@ -408,8 +390,7 @@ class _HomeContentState extends State<HomeContent> {
                               child: Text(
                                 data['tittle'] ?? '',
                                 style: TextStyle(
-                                  fontSize:
-                                      12, // Adjust the font size as needed
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                   overflow: TextOverflow.ellipsis,
@@ -429,29 +410,5 @@ class _HomeContentState extends State<HomeContent> {
         },
       ),
     );
-  }
-}
-
-Future<String?> _fetchPdfUrl(String pdfName) async {
-  try {
-    final ref = FirebaseStorage.instance.ref();
-    var childref = ref.child('book1/I Will Kill The Author c1-141.pdf');
-    return await childref.getDownloadURL();
-  } on FirebaseException catch (e) {
-    print("Failed with error '${e.code}': ${e.message}");
-    return null;
-  }
-}
-
-Future<String?> _downloadPDF(String pdfUrl) async {
-  try {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/book.pdf');
-    await FirebaseStorage.instance.refFromURL(pdfUrl).writeToFile(file);
-    print('PDF downloaded to ${file.path}');
-    return file.path;
-  } catch (e) {
-    print('Error downloading PDF: $e');
-    return null;
   }
 }
