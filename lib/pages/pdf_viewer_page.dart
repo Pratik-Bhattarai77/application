@@ -50,7 +50,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       await flutterTts.setLanguage("en-US");
       await flutterTts.setVoice({"name": "Karen", "locale": "en-AU"});
       await flutterTts.setSpeechRate(1.0);
-      await flutterTts.setVolume(50.0);
+      await flutterTts.setVolume(200.0);
       await flutterTts.setSpeechRate(Platform.isAndroid ? 0.6 : 0.395);
       await flutterTts.awaitSpeakCompletion(true);
       await flutterTts.speak(text);
