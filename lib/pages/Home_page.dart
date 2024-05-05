@@ -285,10 +285,11 @@ class _HomeContentState extends State<HomeContent> {
                           children: [
                             InkWell(
                               onTap: () {
+                                String bookId = firstHalf[index].id;
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        BookInfoPage(bookId: data['bookId']),
+                                        BookInfoPage(bookId: bookId),
                                   ),
                                 );
                               },
@@ -353,10 +354,11 @@ class _HomeContentState extends State<HomeContent> {
                           children: [
                             InkWell(
                               onTap: () {
+                                String bookId = secondHalf[index].id;
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        BookInfoPage(bookId: data['bookId']),
+                                        BookInfoPage(bookId: bookId),
                                   ),
                                 );
                               },

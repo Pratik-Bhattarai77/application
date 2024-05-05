@@ -28,14 +28,14 @@ class _BookInfoPageState extends State<BookInfoPage> {
 
   Future<void> fetchBookDetails() async {
     try {
+      print("jkdfjdkfjkdsnfh: ${widget.bookId}");
       DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
           .collection('User')
           .doc('pOUxhmtf3E6I0e3jM0vG')
           .collection('books')
-          .doc('9ivb6AN79kcNsHQsq0cw')
-          // .doc(widget.bookId)
+          .doc(widget.bookId)
           .get();
-
+      // .doc('9ivb6AN79kcNsHQsq0cw')
       print("Query path: User/pOUxhmtf3E6I0e3jM0vG/books/${widget.bookId}");
 
       if (documentSnapshot.exists) {
