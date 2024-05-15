@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:application/main.dart';
+import 'package:application/pages/libary_page.dart';
 import 'package:application/pages/pdf_viewer_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:path_provider/path_provider.dart';
@@ -77,7 +79,6 @@ class _BookInfoPageState extends State<BookInfoPage> {
       ),
       backgroundColor: const Color.fromARGB(255, 52, 52, 52),
       body: Center(
-        // Wrap the Scaffold with a Center widget
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -101,7 +102,6 @@ class _BookInfoPageState extends State<BookInfoPage> {
                           width: 2,
                         ),
                         boxShadow: [
-                          // Add the boxShadow here
                           BoxShadow(
                             color: const Color.fromARGB(255, 255, 255, 255)
                                 .withOpacity(0.5),
@@ -152,15 +152,32 @@ class _BookInfoPageState extends State<BookInfoPage> {
                               });
                               return;
                             }
-                            Navigator.push(
+
+                            // Navigate to PDFViewerPage
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PDFViewerPage(
                                   pdfUrl: pdfUrl,
                                   bookTitle: data['tittle'] ?? '',
+                                  bookData: data,
                                 ),
                               ),
                             );
+
+                            // Get the currently authenticated user's ID
+                            final user = FirebaseAuth.instance.currentUser;
+
+                            if (user != null) {
+                              // Store the book data in the user-specific subcollection
+                              final userBooks = FirebaseFirestore.instance
+                                  .collection('User')
+                                  .doc(user
+                                      .uid) // Use the user's ID instead of a hardcoded value
+                                  .collection('readBooks');
+
+                              await userBooks.doc(data['id']).set(data);
+                            }
                           },
                           child: Text('Read book'),
                           style: ElevatedButton.styleFrom(

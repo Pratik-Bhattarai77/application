@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:application/pages/pdf_viewer_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -149,23 +150,38 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                         ElevatedButton(
                           onPressed: () async {
-                            final pdfUrl = data[
-                                'pdf']; // Directly use the pdf URL from Firestore
+                            final pdfUrl = data['pdf'];
                             if (pdfUrl == null) {
                               setState(() {
                                 _errorMessage = 'PDF URL is null';
                               });
                               return;
                             }
-                            Navigator.push(
+
+                            // Navigate to PDFViewerPage
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PDFViewerPage(
                                   pdfUrl: pdfUrl,
-                                  bookTitle: 'tittle',
+                                  bookTitle: data['tittle'] ?? '',
+                                  bookData: data,
                                 ),
                               ),
                             );
+
+                            // Get the currently authenticated user's ID
+                            final user = FirebaseAuth.instance.currentUser;
+
+                            if (user != null) {
+                              // Store the book data in the user-specific subcollection
+                              final userBooks = FirebaseFirestore.instance
+                                  .collection('User')
+                                  .doc(user.uid) // Use the user's ID
+                                  .collection('readBooks');
+
+                              await userBooks.doc(data['id']).set(data);
+                            }
                           },
                           child: Text('Read book'),
                           style: ElevatedButton.styleFrom(
@@ -190,29 +206,5 @@ class _SearchPageState extends State<SearchPage> {
             );
           }),
     );
-  }
-
-  Future<String?> _fetchPdfUrl(String pdfName) async {
-    try {
-      final ref = FirebaseStorage.instance.ref();
-      var childref = ref.child('book1/I Will Kill The Author c1-141.pdf');
-      return await childref.getDownloadURL();
-    } on FirebaseException catch (e) {
-      print("Failed with error '${e.code}': ${e.message}");
-      return null;
-    }
-  }
-
-  Future<String?> _downloadPDF(String pdfUrl) async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/book.pdf');
-      await FirebaseStorage.instance.refFromURL(pdfUrl).writeToFile(file);
-      print('PDF downloaded to ${file.path}');
-      return file.path;
-    } catch (e) {
-      print('Error downloading PDF: $e');
-      return null;
-    }
   }
 }

@@ -2,14 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class PDFViewerPage extends StatefulWidget {
   final String pdfUrl;
   final String bookTitle;
 
-  PDFViewerPage({required this.pdfUrl, required this.bookTitle});
+  PDFViewerPage(
+      {required this.pdfUrl,
+      required this.bookTitle,
+      required Map<String, dynamic> bookData});
 
   @override
   _PDFViewerPageState createState() => _PDFViewerPageState();
@@ -21,6 +23,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   late FlutterTts flutterTts;
   String? speakingText;
   bool isPlaying = false;
+  bool isFullScreen = true;
 
   @override
   void initState() {
@@ -65,8 +68,15 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
     await flutterTts.stop();
   }
 
-  Future _pause() async {
-    await flutterTts.pause();
+  void _saveSelectedText() {
+    if (selectedText != null && selectedText!.isNotEmpty) {
+      String formattedText = selectedText!;
+      notes.add({
+        'Highlight Note': widget.bookTitle,
+        'content': formattedText,
+      });
+      setState(() {});
+    }
   }
 
   @override
@@ -93,56 +103,35 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SfPdfViewer.network(
-              widget.pdfUrl,
-              maxZoomLevel: 15.0,
-              onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
-                setState(() {
-                  selectedText = details.selectedText;
-                  speakingText = details
-                      .selectedText; // Assign selected text to speakingText
-                });
-              },
+      body: GestureDetector(
+        onTap: () {
+          setState(() {
+            isFullScreen = !isFullScreen;
+          });
+        },
+        child: Stack(
+          children: [
+            Visibility(
+              visible: isFullScreen,
+              child: SfPdfViewer.network(
+                widget.pdfUrl,
+                maxZoomLevel: 15.0,
+                onTextSelectionChanged:
+                    (PdfTextSelectionChangedDetails details) {
+                  setState(() {
+                    selectedText = details.selectedText;
+                    speakingText = details
+                        .selectedText; // Assign selected text to speakingText
+                  });
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: notes.length,
-              itemBuilder: (context, index) {
-                // Display the book title only once, at the top of the list
-                if (index == 0) {
-                  return ListTile(
-                    title: Text(widget.bookTitle,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
-                    subtitle: Text(notes[index]['content'],
-                        textAlign: TextAlign.justify),
-                  );
-                } else {
-                  return ListTile(
-                    title: Text(notes[index]['content'],
-                        textAlign: TextAlign.justify),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
+            // Add other widgets here if needed
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (selectedText != null && selectedText!.isNotEmpty) {
-            String formattedText = selectedText!;
-            notes.add({
-              'Hilight Note': widget.bookTitle,
-              'content': formattedText,
-            });
-            setState(() {});
-          }
-        },
+        onPressed: _saveSelectedText,
         child: Icon(Icons.save),
       ),
     );

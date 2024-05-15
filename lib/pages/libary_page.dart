@@ -1,4 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:application/pages/pdf_viewer_page.dart';
 
 class LibraryPage extends StatefulWidget {
   const LibraryPage({Key? key}) : super(key: key);
@@ -8,116 +12,142 @@ class LibraryPage extends StatefulWidget {
 }
 
 class _LibraryPageState extends State<LibraryPage> {
-  final List<String> bookImages = [
-    'lib/images/Rectangle 2.png',
-    'lib/images/Rectangle 8.png',
-    'lib/images/Rectangle 28.png',
-    // Add more book images as needed
-  ];
-
-  final List<String> bookDescriptions = [
-    '"Legendary assassin seeks vengeance after thugs kill his beloved dog, leading to a relentless and action-packed pursuit of justice."',
-    '"Orphaned wizard Harry Potter discovers his magical heritage, battles dark forces, and learns the power of friendship at Hogwarts School."',
-    '"The Psychology of Money" explores the behavioral aspects of finance, revealing insights into decision-making and wealth management in 20 words.',
-    // Add more descriptions as needed
-  ];
-
-  final List<String> bookTitles = [
-    'Jon Wick',
-    'Harry Potter',
-    'The Psychology of Money',
-    // Add more titles as needed
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 52, 52, 52),
-      body: PageView.builder(
-        itemCount: bookImages.length,
-        itemBuilder: (context, index) {
-          return Center(
-            child: Container(
-              width: 340,
-              margin: EdgeInsets.all(20),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 340,
-                      height: 250,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                          image: AssetImage(bookImages[index]),
-                          fit: BoxFit.contain,
-                        ),
-                      ),
+      body: user != null
+          ? StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('User')
+                  .doc(user.uid)
+                  .collection('readBooks')
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No books in your library',
+                      style: TextStyle(color: Colors.white),
                     ),
-                    SizedBox(height: 60),
-                    SizedBox(
-                      height: 159,
-                      width: 340,
-                      child: Container(
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFFEDD3),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                  );
+                }
+
+                return ListView(
+                  children:
+                      snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Card(
+                        color: Color.fromARGB(255, 52, 52, 52),
+                        margin: const EdgeInsets.all(16.0),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text(
-                              bookTitles[
-                                  index], // Use corresponding title for each book
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Expanded(
-                              child: SingleChildScrollView(
-                                child: Text(
-                                  bookDescriptions[
-                                      index], // Use corresponding description for each book
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 16,
+                            Center(
+                              child: CachedNetworkImage(
+                                imageUrl: data['image'] ?? '',
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                                fit: BoxFit.cover,
+                                height: 160,
+                                width: 120,
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Apply borderRadius here
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Action to perform when the button is pressed
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(Colors.black),
-                                ),
-                                child: Text(
-                                  'Read',
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                            SizedBox(height: 20.0),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              decoration: BoxDecoration(
+                                // Use BoxDecoration here
+                                color: Color(
+                                    0xFFFFEDD3), // Specify color within BoxDecoration
+                                borderRadius: BorderRadius.circular(
+                                    8.0), // Apply borderRadius here
+                              ), // End BoxDecoration
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data['tittle'] ?? '',
+                                    style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors
+                                            .black), // Adjusted text color for contrast
+                                  ),
+                                  SizedBox(height: 20.0),
+                                  Center(
+                                    // Place the button inside its own Center widget
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        final pdfUrl = data['pdf'];
+                                        if (pdfUrl == null) {
+                                          // Handle null PDF URL error
+                                          return;
+                                        }
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => PDFViewerPage(
+                                              pdfUrl: pdfUrl,
+                                              bookTitle: data['tittle'] ?? '',
+                                              bookData: data,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text('Read Book'),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: const Color.fromARGB(
+                                            255, 18, 18, 18),
+                                        onPrimary: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    );
+                  }).toList(),
+                );
+              },
+            )
+          : Center(
+              child: Text('Please log in to access your library'),
             ),
-          );
-        },
-      ),
     );
   }
 }
