@@ -13,7 +13,6 @@ import 'package:application/pages/help_page.dart';
 import 'package:application/pages/notes_page.dart';
 import 'package:application/pages/profile_page.dart';
 import 'package:application/pages/search_page.dart';
-import 'package:application/pages/setting_page.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -372,7 +371,7 @@ class _HomeContentState extends State<HomeContent> {
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
                                   fit: BoxFit.cover,
-                                  height: 160,
+                                  height: 150,
                                   width: 100,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(

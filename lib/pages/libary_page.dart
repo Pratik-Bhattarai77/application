@@ -44,75 +44,56 @@ class _LibraryPageState extends State<LibraryPage> {
                   );
                 }
 
-                return ListView(
-                  children:
-                      snapshot.data!.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> data =
-                        document.data() as Map<String, dynamic>;
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Card(
-                        color: Color.fromARGB(255, 52, 52, 52),
-                        margin: const EdgeInsets.all(16.0),
+                return PageView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> data = snapshot.data!.docs[index]
+                        .data() as Map<String, dynamic>;
+                    return Center(
+                      child: Container(
+                        width: 340,
+                        margin: EdgeInsets.all(20),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Center(
-                              child: CachedNetworkImage(
-                                imageUrl: data['image'] ?? '',
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                                fit: BoxFit.cover,
-                                height: 160,
-                                width: 120,
-                                imageBuilder: (context, imageProvider) =>
-                                    Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        8.0), // Apply borderRadius here
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 2,
-                                    ),
-                                    image: DecorationImage(
-                                      image: imageProvider,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                            Container(
+                              width: 340,
+                              height: 250,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                image: DecorationImage(
+                                  image: NetworkImage(data['image'] ?? ''),
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20.0),
+                            SizedBox(height: 60),
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              height: 159,
+                              width: 340,
+                              padding: EdgeInsets.all(20),
                               decoration: BoxDecoration(
-                                // Use BoxDecoration here
-                                color: Color(
-                                    0xFFFFEDD3), // Specify color within BoxDecoration
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // Apply borderRadius here
-                              ), // End BoxDecoration
+                                color: Color(0xFFFFEDD3),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     data['tittle'] ?? '',
                                     style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors
-                                            .black), // Adjusted text color for contrast
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  SizedBox(height: 20.0),
-                                  Center(
-                                    // Place the button inside its own Center widget
+                                  SizedBox(height: 35),
+                                  Align(
+                                    alignment: Alignment.bottomCenter,
                                     child: ElevatedButton(
                                       onPressed: () {
                                         final pdfUrl = data['pdf'];
                                         if (pdfUrl == null) {
-                                          // Handle null PDF URL error
                                           return;
                                         }
                                         Navigator.push(
@@ -126,11 +107,14 @@ class _LibraryPageState extends State<LibraryPage> {
                                           ),
                                         );
                                       },
-                                      child: Text('Read Book'),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: const Color.fromARGB(
-                                            255, 18, 18, 18),
-                                        onPrimary: Colors.white,
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                Colors.black),
+                                      ),
+                                      child: Text(
+                                        'Read',
+                                        style: TextStyle(color: Colors.white),
                                       ),
                                     ),
                                   ),
@@ -141,7 +125,7 @@ class _LibraryPageState extends State<LibraryPage> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  },
                 );
               },
             )

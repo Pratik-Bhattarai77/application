@@ -185,8 +185,8 @@ class _SearchPageState extends State<SearchPage> {
                           },
                           child: Text('Read book'),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.orange,
-                            onPrimary: Colors.white,
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
                           ),
                         ),
                         if (_errorMessage != null)

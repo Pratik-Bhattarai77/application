@@ -26,14 +26,6 @@ class _NotePageState extends State<NotePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Your Notes",
-              style: GoogleFonts.poppins(
-                color: const Color.fromARGB(255, 239, 240, 241),
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-            ),
             const SizedBox(
               height: 20.0,
             ),

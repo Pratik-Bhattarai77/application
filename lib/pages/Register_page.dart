@@ -1,12 +1,13 @@
-import 'package:application/components/my_button.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:application/components/my_button.dart';
 import 'package:application/components/my_textfield.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
-  const RegisterPage({super.key, required this.onTap});
+  const RegisterPage({Key? key, required this.onTap}) : super(key: key);
+
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
@@ -23,52 +24,42 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  // sign user in method
   Future signUserIn() async {
-    // Regex pattern for email validation
     final RegExp emailRegex = RegExp(r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+');
 
-    // Check if any field is empty
     if (usernameController.text.isEmpty ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
       displayMessage("Please fill in all fields.");
-      return; // Exit the method if validation fails
+      return;
     }
 
-    // Check if passwords match
     if (passwordController.text != confirmPasswordController.text) {
       displayMessage("Passwords do not match.");
-      return; // Exit the method if validation fails
+      return;
     }
 
-    // Validate email format
     if (!emailRegex.hasMatch(usernameController.text)) {
       displayMessage("Please enter a valid email address.");
-      return; // Exit the method if email format is invalid
+      return;
     }
 
     showDialog(
       context: context,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: usernameController.text.trim(),
           password: passwordController.text.trim());
-      //user details
       addUserdetails(
           fullnameController.text.trim(), usernameController.text.trim());
       if (mounted) {
-        // Check if the widget is still mounted
         Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
-        // Check if the widget is still mounted
         Navigator.pop(context);
         displayMessage(e.message ?? 'An error occurred. Please try again.');
       }
@@ -85,28 +76,22 @@ class _RegisterPageState extends State<RegisterPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context)
-            .dialogBackgroundColor, // Consistent with app theme
+        backgroundColor: Theme.of(context).dialogBackgroundColor,
         title: Center(
           child: Text(
             'Alert!!',
             style: TextStyle(
-              color: Theme.of(context)
-                  .textTheme
-                  .headline6
-                  ?.color, // Consistent text color
+              color:
+                  Theme.of(context).textTheme.titleLarge?.color ?? Colors.black,
             ),
           ),
         ),
         content: Text(
           message,
-          textAlign: TextAlign.center, // Center the content text
+          textAlign: TextAlign.center,
           style: TextStyle(
-            color: Theme.of(context)
-                .textTheme
-                .bodyText1
-                ?.color, // Consistent text color
-            fontSize: 18, // Increase font size to 18
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+            fontSize: 18,
           ),
         ),
         actions: <Widget>[
@@ -131,7 +116,6 @@ class _RegisterPageState extends State<RegisterPage> {
       backgroundColor: const Color.fromARGB(255, 219, 218, 218),
       body: SafeArea(
         child: SingleChildScrollView(
-          // Wrap with SingleChildScrollView
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -143,7 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 50),
                 const Text(
-                  'Lets Create an Account',
+                  'Let\'s Create an Account',
                   style: TextStyle(
                     color: Color.fromARGB(255, 94, 93, 94),
                     fontSize: 16,
@@ -170,7 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 10),
                 MyTextField(
                   controller: confirmPasswordController,
-                  hintText: 'Confirm-Password',
+                  hintText: 'Confirm Password',
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),

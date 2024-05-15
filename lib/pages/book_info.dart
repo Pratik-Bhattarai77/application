@@ -181,8 +181,8 @@ class _BookInfoPageState extends State<BookInfoPage> {
                           },
                           child: Text('Read book'),
                           style: ElevatedButton.styleFrom(
-                            primary: const Color.fromARGB(255, 0, 0, 0),
-                            onPrimary: Colors.white,
+                            backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+                            foregroundColor: Colors.white,
                           ),
                         ),
                       ],

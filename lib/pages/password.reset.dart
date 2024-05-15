@@ -127,8 +127,8 @@ class _PasswordState extends State<Password> {
             onPressed: passwordReset,
             child: const Text('Submit'),
             style: ElevatedButton.styleFrom(
-              primary: Colors.orange, // Button color
-              onPrimary: Colors.white, // Text color
+              backgroundColor: Colors.orange, // Button color
+              foregroundColor: Colors.white, // Text color
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12), // Border radius
               ),
