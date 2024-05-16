@@ -23,11 +23,11 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   String? selectedText;
   List<Map<String, dynamic>> notes = [];
   late FlutterTts flutterTts;
-  String? speakingText;
   bool isPlaying = false;
   bool isFullScreen = true;
   bool readEntireBook = false;
   String? bookText;
+  DateTime lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
   void initState() {
@@ -60,42 +60,42 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       final bytes = await consolidateHttpClientResponseBytes(response);
 
       final document = PdfDocument(inputBytes: bytes);
-      final pages = document.pages;
-      final bookTextBuffer = StringBuffer();
-
-      for (int i = 0; i < pages.count; i++) {
-        final page = pages[i];
-        final textExtractor = PdfTextExtractor(page as PdfDocument);
-        final text = textExtractor.extractText();
-        bookTextBuffer.write(text);
-      }
+      final textExtractor = PdfTextExtractor(document);
+      final bookText = textExtractor.extractText();
 
       setState(() {
-        bookText = bookTextBuffer.toString();
+        this.bookText = bookText;
       });
     } catch (e) {
       print('Error loading book text: $e');
     }
   }
 
-  Future _speak(String text) async {
+  Future _speak() async {
     try {
       await flutterTts.setLanguage("en-US");
-      await flutterTts.setVoice({"name": "Karen", "locale": "en-AU"});
       await flutterTts.setSpeechRate(1.0);
-      await flutterTts.setVolume(200.0);
+      await flutterTts.setVolume(1.0);
       await flutterTts.setSpeechRate(Platform.isAndroid ? 0.6 : 0.395);
       await flutterTts.awaitSpeakCompletion(true);
 
       if (readEntireBook && bookText != null) {
         await flutterTts.speak(bookText!);
-      } else {
-        await flutterTts.speak(text);
+      }
+
+      if (selectedText != null && selectedText!.isNotEmpty) {
+        await flutterTts.speak(selectedText!);
       }
     } catch (e) {
       print('Error setting voice: $e');
       await flutterTts.setVoice({"name": "Default", "locale": "en-US"});
-      await flutterTts.speak(text);
+      if (readEntireBook && bookText != null) {
+        await flutterTts.speak(bookText!);
+      }
+
+      if (selectedText != null && selectedText!.isNotEmpty) {
+        await flutterTts.speak(selectedText!);
+      }
     }
   }
 
@@ -114,6 +114,14 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
     }
   }
 
+  void _handlePlayButtonTap() {
+    setState(() {
+      readEntireBook = !readEntireBook;
+    });
+
+    _speak();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,14 +134,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.play_arrow),
-            onPressed: () {
-              if (speakingText != null) {
-                setState(() {
-                  readEntireBook = !readEntireBook;
-                });
-                _speak(speakingText!);
-              }
-            },
+            onPressed: _handlePlayButtonTap,
           ),
           IconButton(
             icon: Icon(Icons.stop),
@@ -158,7 +159,6 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
                     (PdfTextSelectionChangedDetails details) {
                   setState(() {
                     selectedText = details.selectedText;
-                    speakingText = details.selectedText;
                   });
                 },
               ),
