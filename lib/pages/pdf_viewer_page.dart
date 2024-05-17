@@ -83,7 +83,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         await flutterTts.speak(bookText!);
       }
 
-      if (selectedText != null && selectedText!.isNotEmpty) {
+      if (!readEntireBook && selectedText != null && selectedText!.isNotEmpty) {
         await flutterTts.speak(selectedText!);
       }
     } catch (e) {
@@ -93,7 +93,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         await flutterTts.speak(bookText!);
       }
 
-      if (selectedText != null && selectedText!.isNotEmpty) {
+      if (!readEntireBook && selectedText != null && selectedText!.isNotEmpty) {
         await flutterTts.speak(selectedText!);
       }
     }
