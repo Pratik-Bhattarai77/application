@@ -26,8 +26,8 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   bool isPlaying = false;
   bool isFullScreen = true;
   bool readEntireBook = false;
-  String? bookText;
-  DateTime lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
+  PdfDocument? document;
+  int currentPageIndex = 0;
 
   @override
   void initState() {
@@ -38,10 +38,22 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         isPlaying = true;
       });
     });
-    flutterTts.setCompletionHandler(() {
-      setState(() {
-        isPlaying = false;
-      });
+    flutterTts.setCompletionHandler(() async {
+      if (readEntireBook) {
+        currentPageIndex++;
+        if (currentPageIndex < document!.pages.count) {
+          await _speak();
+        } else {
+          setState(() {
+            isPlaying = false;
+            readEntireBook = false;
+          });
+        }
+      } else {
+        setState(() {
+          isPlaying = false;
+        });
+      }
     });
     flutterTts.setErrorHandler((msg) {
       setState(() {
@@ -49,25 +61,22 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       });
     });
 
-    loadBookText();
+    loadDocument();
   }
 
-  Future<void> loadBookText() async {
+  Future<void> loadDocument() async {
     try {
       final httpClient = HttpClient();
       final request = await httpClient.getUrl(Uri.parse(widget.pdfUrl));
       final response = await request.close();
       final bytes = await consolidateHttpClientResponseBytes(response);
+      httpClient.close();
 
-      final document = PdfDocument(inputBytes: bytes);
-      final textExtractor = PdfTextExtractor(document);
-      final bookText = textExtractor.extractText();
+      document = PdfDocument(inputBytes: bytes);
 
-      setState(() {
-        this.bookText = bookText;
-      });
+      setState(() {});
     } catch (e) {
-      print('Error loading book text: $e');
+      print('Error loading document: $e');
     }
   }
 
@@ -79,8 +88,25 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       await flutterTts.setSpeechRate(Platform.isAndroid ? 0.6 : 0.395);
       await flutterTts.awaitSpeakCompletion(true);
 
-      if (readEntireBook && bookText != null) {
-        await flutterTts.speak(bookText!);
+      if (readEntireBook && document != null) {
+        final textExtractor = PdfTextExtractor(document!);
+        final pageText = textExtractor.extractText(
+            startPageIndex: currentPageIndex, endPageIndex: currentPageIndex);
+
+        if (pageText.isNotEmpty) {
+          await flutterTts.speak(pageText);
+        } else {
+          // Handle empty text (page with only images)
+          currentPageIndex++;
+          if (currentPageIndex < document!.pages.count) {
+            await _speak();
+          } else {
+            setState(() {
+              isPlaying = false;
+              readEntireBook = false;
+            });
+          }
+        }
       }
 
       if (!readEntireBook && selectedText != null && selectedText!.isNotEmpty) {
@@ -89,8 +115,25 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
     } catch (e) {
       print('Error setting voice: $e');
       await flutterTts.setVoice({"name": "Default", "locale": "en-US"});
-      if (readEntireBook && bookText != null) {
-        await flutterTts.speak(bookText!);
+      if (readEntireBook && document != null) {
+        final textExtractor = PdfTextExtractor(document!);
+        final pageText = textExtractor.extractText(
+            startPageIndex: currentPageIndex, endPageIndex: currentPageIndex);
+
+        if (pageText.isNotEmpty) {
+          await flutterTts.speak(pageText);
+        } else {
+          // Handle empty text (page with only images)
+          currentPageIndex++;
+          if (currentPageIndex < document!.pages.count) {
+            await _speak();
+          } else {
+            setState(() {
+              isPlaying = false;
+              readEntireBook = false;
+            });
+          }
+        }
       }
 
       if (!readEntireBook && selectedText != null && selectedText!.isNotEmpty) {
@@ -101,6 +144,11 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
 
   Future _stop() async {
     await flutterTts.stop();
+    setState(() {
+      isPlaying = false;
+      readEntireBook = false;
+      currentPageIndex = 0;
+    });
   }
 
   void _saveSelectedText() {
@@ -117,6 +165,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   void _handlePlayButtonTap() {
     setState(() {
       readEntireBook = !readEntireBook;
+      currentPageIndex = 0;
     });
 
     _speak();
@@ -152,16 +201,20 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
           children: [
             Visibility(
               visible: isFullScreen,
-              child: SfPdfViewer.network(
-                widget.pdfUrl,
-                maxZoomLevel: 15.0,
-                onTextSelectionChanged:
-                    (PdfTextSelectionChangedDetails details) {
-                  setState(() {
-                    selectedText = details.selectedText;
-                  });
-                },
-              ),
+              child: document != null
+                  ? SfPdfViewer.network(
+                      widget.pdfUrl,
+                      maxZoomLevel: 15.0,
+                      onTextSelectionChanged:
+                          (PdfTextSelectionChangedDetails details) {
+                        setState(() {
+                          selectedText = details.selectedText;
+                        });
+                      },
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
             ),
           ],
         ),
@@ -171,5 +224,11 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         child: Icon(Icons.save),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    flutterTts.stop();
+    super.dispose();
   }
 }
