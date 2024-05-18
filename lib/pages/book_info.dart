@@ -1,13 +1,8 @@
-import 'dart:io';
-import 'package:application/main.dart';
-import 'package:application/pages/libary_page.dart';
 import 'package:application/pages/pdf_viewer_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:path_provider/path_provider.dart';
 
 class BookInfoPage extends StatefulWidget {
   final String? bookId;

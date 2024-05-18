@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:application/pages/book_info.dart';
 import 'package:application/pages/libary_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,8 +10,6 @@ import 'package:application/pages/help_page.dart';
 import 'package:application/pages/notes_page.dart';
 import 'package:application/pages/profile_page.dart';
 import 'package:application/pages/search_page.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
