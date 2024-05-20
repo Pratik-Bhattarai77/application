@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PDFViewerPage extends StatefulWidget {
   final String pdfUrl;
@@ -28,6 +31,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   bool readEntireBook = false;
   PdfDocument? document;
   int currentPageIndex = 0;
+  double voiceSpeed = 1.0; // Default speed
 
   @override
   void initState() {
@@ -83,7 +87,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   Future _speak() async {
     try {
       await flutterTts.setLanguage("en-US");
-      await flutterTts.setSpeechRate(1.0);
+      await flutterTts.setSpeechRate(voiceSpeed); // Use voiceSpeed here
       await flutterTts.setVolume(1.0);
       await flutterTts.setSpeechRate(Platform.isAndroid ? 0.6 : 0.395);
       await flutterTts.awaitSpeakCompletion(true);
@@ -151,13 +155,17 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
     });
   }
 
-  void _saveSelectedText() {
+  Future<void> _saveSelectedText() async {
     if (selectedText != null && selectedText!.isNotEmpty) {
       String formattedText = selectedText!;
-      notes.add({
-        'Highlight Note': widget.bookTitle,
+      final userData = FirebaseFirestore.instance
+          .collection('User')
+          .doc(FirebaseAuth.instance.currentUser?.uid);
+      final noteData = {
+        'bookTitle': widget.bookTitle,
         'content': formattedText,
-      });
+      };
+      await userData.collection('notes').add(noteData);
       setState(() {});
     }
   }
@@ -171,6 +179,13 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
     _speak();
   }
 
+  void _updateVoiceSpeed(double newSpeed) {
+    setState(() {
+      voiceSpeed = newSpeed;
+      flutterTts.setSpeechRate(newSpeed);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,16 +193,42 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         backgroundColor: Color.fromARGB(255, 216, 211, 211),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.play_arrow),
-            onPressed: _handlePlayButtonTap,
+            onPressed: () {
+              _handlePlayButtonTap();
+            },
           ),
           IconButton(
             icon: Icon(Icons.stop),
-            onPressed: _stop,
+            onPressed: () {
+              _stop();
+            },
+          ),
+          PopupMenuButton<double>(
+            icon: Icon(Icons.speed),
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(
+                  value: 0.5,
+                  child: Text('Slow'),
+                ),
+                PopupMenuItem(
+                  value: 1.0,
+                  child: Text('Normal'),
+                ),
+                PopupMenuItem(
+                  value: 1.5,
+                  child: Text('Fast'),
+                ),
+              ];
+            },
+            onSelected: _updateVoiceSpeed,
           ),
         ],
       ),
@@ -210,6 +251,40 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
                         setState(() {
                           selectedText = details.selectedText;
                         });
+                        if (selectedText != null && selectedText!.isNotEmpty) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Add Note'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedText = value;
+                                    });
+                                  },
+                                  controller:
+                                      TextEditingController(text: selectedText),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  ElevatedButton(
+                                    child: Text('Save'),
+                                    onPressed: () {
+                                      _saveSelectedText();
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
                       },
                     )
                   : Center(
@@ -220,15 +295,11 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _saveSelectedText,
+        onPressed: () {
+          _saveSelectedText();
+        },
         child: Icon(Icons.save),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    flutterTts.stop();
-    super.dispose();
   }
 }
