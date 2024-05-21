@@ -292,12 +292,6 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
             },
             onSelected: _updateVoiceSpeed,
           ),
-          IconButton(
-            icon: Icon(Icons.note),
-            onPressed: () {
-              _showSavedNotes();
-            },
-          ),
         ],
       ),
       body: GestureDetector(
@@ -358,6 +352,23 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
                   : Center(
                       child: CircularProgressIndicator(),
                     ),
+            ),
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: ElevatedButton(
+                onPressed: _showSavedNotes,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(
+                      255, 255, 153, 0), // Set the background color to orange
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(16),
+                ),
+                child: Icon(
+                  Icons.note,
+                  color: Colors.white, // Set the icon color to white
+                ),
+              ),
             ),
           ],
         ),
