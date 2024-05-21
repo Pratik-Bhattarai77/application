@@ -1,12 +1,13 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PDFViewerPage extends StatefulWidget {
   final String pdfUrl;
@@ -66,6 +67,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
     });
 
     loadDocument();
+    _fetchNotes();
   }
 
   Future<void> loadDocument() async {
@@ -153,15 +155,24 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   Future<void> _saveSelectedText() async {
     if (selectedText != null && selectedText!.isNotEmpty) {
       String formattedText = selectedText!;
-      final userData = FirebaseFirestore.instance
-          .collection('User')
-          .doc(FirebaseAuth.instance.currentUser?.uid);
-      final noteData = {
-        'bookTitle': widget.bookTitle,
-        'content': formattedText,
-      };
-      await userData.collection('notes').add(noteData);
-      setState(() {});
+      print('Saving selected text: $formattedText'); // Debugging output
+
+      try {
+        final userData = FirebaseFirestore.instance
+            .collection('User')
+            .doc(FirebaseAuth.instance.currentUser?.uid);
+        final noteData = {
+          'bookTitle': widget.bookTitle,
+          'content': formattedText,
+          'fromSelectedText': true, // Add this line
+        };
+
+        await userData.collection('notes').add(noteData);
+        print('Note saved successfully'); // Debugging output
+        setState(() {});
+      } catch (e) {
+        print('Error saving note: $e'); // Error handling
+      }
     }
   }
 
@@ -182,6 +193,59 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       voiceSpeed = newSpeed;
       flutterTts.setSpeechRate(newSpeed);
     });
+  }
+
+  Future<void> _fetchNotes({bool fromSelectedText = false}) async {
+    try {
+      final userData = FirebaseFirestore.instance
+          .collection('User')
+          .doc(FirebaseAuth.instance.currentUser?.uid);
+      final notesSnapshot = await userData
+          .collection('notes')
+          .where('fromSelectedText', isEqualTo: fromSelectedText)
+          .get();
+
+      notes = notesSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      setState(() {});
+    } catch (e) {
+      print('Error fetching notes: $e');
+    }
+  }
+
+  Future<void> _showSavedNotes() async {
+    await _fetchNotes(
+        fromSelectedText: true); // Fetch only notes created from selected text
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Hilighted Phrases'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: notes.map((note) {
+                return Container(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(note['content']),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -227,6 +291,12 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
               ];
             },
             onSelected: _updateVoiceSpeed,
+          ),
+          IconButton(
+            icon: Icon(Icons.note),
+            onPressed: () {
+              _showSavedNotes();
+            },
           ),
         ],
       ),
@@ -291,12 +361,6 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _saveSelectedText();
-        },
-        child: Icon(Icons.save),
       ),
     );
   }
