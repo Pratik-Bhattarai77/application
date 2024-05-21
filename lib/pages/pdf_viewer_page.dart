@@ -111,9 +111,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
             });
           }
         }
-      }
-
-      if (!readEntireBook && selectedText != null && selectedText!.isNotEmpty) {
+      } else if (selectedText != null && selectedText!.isNotEmpty) {
         await flutterTts.speak(selectedText!);
       }
     } catch (e) {
@@ -127,7 +125,6 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
         if (pageText.isNotEmpty) {
           await flutterTts.speak(pageText);
         } else {
-          // Handle empty text (page with only images)
           currentPageIndex++;
           if (currentPageIndex < document!.pages.count) {
             await _speak();
@@ -138,9 +135,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
             });
           }
         }
-      }
-
-      if (!readEntireBook && selectedText != null && selectedText!.isNotEmpty) {
+      } else if (selectedText != null && selectedText!.isNotEmpty) {
         await flutterTts.speak(selectedText!);
       }
     }
@@ -171,12 +166,15 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   }
 
   void _handlePlayButtonTap() {
-    setState(() {
-      readEntireBook = !readEntireBook;
-      currentPageIndex = 0;
-    });
-
-    _speak();
+    if (selectedText != null && selectedText!.isNotEmpty) {
+      _speak(); // Read the selected text
+    } else {
+      setState(() {
+        readEntireBook = !readEntireBook;
+        currentPageIndex = 0;
+      });
+      _speak(); // Read the entire book
+    }
   }
 
   void _updateVoiceSpeed(double newSpeed) {
