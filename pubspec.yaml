@@ -62,7 +62,7 @@ dependencies:
   flutter_downloader: ^1.11.7
   flutter_tts: ^4.0.2
   pdf: ^3.10.8
-  
+  khalti: ^2.0.0
   
 dependency_overrides:
   web: ^0.5.1
