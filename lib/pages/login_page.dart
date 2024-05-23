@@ -21,7 +21,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> signUserIn() async {
     setState(() {
-      _isLoading = true;
+      _isLoading =
+          true; // Set _isLoading to true before starting the sign-in process
     });
 
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
@@ -37,6 +38,10 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text('OK'),
                   onPressed: () {
                     Navigator.of(context).pop();
+                    setState(() {
+                      _isLoading =
+                          false; // Set _isLoading to false after showing the dialog
+                    });
                   },
                 ),
               ],
@@ -44,22 +49,48 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
       }
-      setState(() {
-        _isLoading = false;
-      });
       return; // Exit the method if validation fails
     }
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
-      );
-      // Sign-in successful
-      setState(() {
-        _isLoading = false;
+      )
+          .then((_) {
+        // Sign-in successful
+        // Navigate to home page or perform any other action
+        setState(() {
+          _isLoading =
+              false; // Set _isLoading to false after successful sign-in
+        });
+      }).catchError((error) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Validation Error'),
+                content: Text('Incorrect email or password.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        _isLoading =
+                            false; // Set _isLoading to false after showing the dialog
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       });
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (e) {
       // Handle sign-in error
       if (mounted) {
         showDialog(
@@ -67,12 +98,16 @@ class _LoginPageState extends State<LoginPage> {
           builder: (context) {
             return AlertDialog(
               title: Text('Validation Error'),
-              content: Text('Incorrect email or password.'),
+              content: Text(e.message ?? 'An unknown error occurred.'),
               actions: <Widget>[
                 TextButton(
                   child: Text('OK'),
                   onPressed: () {
                     Navigator.of(context).pop();
+                    setState(() {
+                      _isLoading =
+                          false; // Set _isLoading to false after showing the dialog
+                    });
                   },
                 ),
               ],
@@ -80,9 +115,75 @@ class _LoginPageState extends State<LoginPage> {
           },
         );
       }
-      setState(() {
-        _isLoading = false;
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    setState(() {
+      _isLoading =
+          true; // Set _isLoading to true before starting the Google sign-in process
+    });
+
+    try {
+      await AuthService().signInWithGoogle().then((_) {
+        // Google sign-in successful
+        // Navigate to home page or perform any other action
+        setState(() {
+          _isLoading =
+              false; // Set _isLoading to false after successful sign-in
+        });
+      }).catchError((error) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Error'),
+                content: Text(
+                    'An error occurred during Google sign-in. Please try again later.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        _isLoading =
+                            false; // Set _isLoading to false after showing the dialog
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       });
+    } catch (e) {
+      // Handle Google sign-in error
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text(
+                  'An error occurred during Google sign-in. Please try again later.'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _isLoading =
+                          false; // Set _isLoading to false after showing the dialog
+                    });
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -158,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 25),
                 MyButton(
                   onTap: _isLoading ? null : signUserIn,
-                  text: _isLoading ? 'Loading...' : 'Sign in',
+                  text: _isLoading ? '' : 'Sign in',
                   child: _isLoading ? CircularProgressIndicator() : null,
                 ),
                 const SizedBox(height: 50),
@@ -195,8 +296,10 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SquareTile(
-                        onTap: () => AuthService().signInWithGoogle(),
-                        imagePath: 'lib/images/google.png'),
+                      onTap: _isLoading ? null : signInWithGoogle,
+                      imagePath: 'lib/images/google.png',
+                      child: _isLoading ? CircularProgressIndicator() : null,
+                    ),
                     const SizedBox(width: 25),
                   ],
                 ),

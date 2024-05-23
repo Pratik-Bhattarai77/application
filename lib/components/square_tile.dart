@@ -7,6 +7,7 @@ class SquareTile extends StatelessWidget {
     super.key,
     required this.imagePath,
     required this.onTap,
+    CircularProgressIndicator? child,
   });
 
   @override

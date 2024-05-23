@@ -169,9 +169,9 @@ class HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<HomeContent> {
   final myitems = [
-    'lib/images/slide2.png',
-    'lib/images/slide3.png',
-    'lib/images/slide1.png',
+    'lib/images/Ikiga.png',
+    'lib/images/money.png',
+    'lib/images/ooo.png',
   ];
 
   @override
