@@ -6,6 +6,7 @@ import 'package:application/components/my_textfield.dart';
 import 'package:application/components/square_tile.dart';
 import 'package:application/pages/password.reset.dart';
 
+// LoginPage widget which represents the login screen
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
   const LoginPage({super.key, required this.onTap});
@@ -19,10 +20,10 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   bool _isLoading = false;
 
+  // Method to sign in the user using email and password
   Future<void> signUserIn() async {
     setState(() {
-      _isLoading =
-          true; // Set _isLoading to true before starting the sign-in process
+      _isLoading = true; // Start the loading indicator
     });
 
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
@@ -39,8 +40,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     setState(() {
-                      _isLoading =
-                          false; // Set _isLoading to false after showing the dialog
+                      _isLoading = false; // Stop the loading indicator
                     });
                   },
                 ),
@@ -59,11 +59,9 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text,
       )
           .then((_) {
-        // Sign-in successful
-        // Navigate to home page or perform any other action
+        // Sign-in successful, stop the loading indicator
         setState(() {
-          _isLoading =
-              false; // Set _isLoading to false after successful sign-in
+          _isLoading = false;
         });
       }).catchError((error) {
         if (mounted) {
@@ -79,8 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       Navigator.of(context).pop();
                       setState(() {
-                        _isLoading =
-                            false; // Set _isLoading to false after showing the dialog
+                        _isLoading = false; // Stop the loading indicator
                       });
                     },
                   ),
@@ -91,7 +88,6 @@ class _LoginPageState extends State<LoginPage> {
         }
       });
     } on FirebaseAuthException catch (e) {
-      // Handle sign-in error
       if (mounted) {
         showDialog(
           context: context,
@@ -105,8 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     setState(() {
-                      _isLoading =
-                          false; // Set _isLoading to false after showing the dialog
+                      _isLoading = false; // Stop the loading indicator
                     });
                   },
                 ),
@@ -118,19 +113,17 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // Method to sign in the user using Google
   Future<void> signInWithGoogle() async {
     setState(() {
-      _isLoading =
-          true; // Set _isLoading to true before starting the Google sign-in process
+      _isLoading = true; // Start the loading indicator
     });
 
     try {
       await AuthService().signInWithGoogle().then((_) {
-        // Google sign-in successful
-        // Navigate to home page or perform any other action
+        // Google sign-in successful, stop the loading indicator
         setState(() {
-          _isLoading =
-              false; // Set _isLoading to false after successful sign-in
+          _isLoading = false;
         });
       }).catchError((error) {
         if (mounted) {
@@ -147,8 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       Navigator.of(context).pop();
                       setState(() {
-                        _isLoading =
-                            false; // Set _isLoading to false after showing the dialog
+                        _isLoading = false; // Stop the loading indicator
                       });
                     },
                   ),
@@ -159,7 +151,6 @@ class _LoginPageState extends State<LoginPage> {
         }
       });
     } catch (e) {
-      // Handle Google sign-in error
       if (mounted) {
         showDialog(
           context: context,
@@ -174,8 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     setState(() {
-                      _isLoading =
-                          false; // Set _isLoading to false after showing the dialog
+                      _isLoading = false; // Stop the loading indicator
                     });
                   },
                 ),
@@ -187,6 +177,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // Navigate to Password Reset Page
   void navigateToPasswordReset() {
     Navigator.push(
       context,

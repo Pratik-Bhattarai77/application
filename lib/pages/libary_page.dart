@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:application/pages/pdf_viewer_page.dart';
 
+// LibraryPage widget to display user's read books
 class LibraryPage extends StatefulWidget {
   const LibraryPage({Key? key}) : super(key: key);
 
@@ -10,18 +11,20 @@ class LibraryPage extends StatefulWidget {
   State<LibraryPage> createState() => _LibraryPageState();
 }
 
+// State class for LibraryPage
 class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser; // Get the current user
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 52, 52, 52),
       body: user != null
           ? StreamBuilder<QuerySnapshot>(
+              // Stream to get the list of read books from Firestore for the current user
               stream: FirebaseFirestore.instance
                   .collection('User')
-                  .doc(user.uid)
+                  .doc(user.uid) // Use the user's ID
                   .collection('readBooks')
                   .snapshots(),
               builder: (BuildContext context,
@@ -46,6 +49,7 @@ class _LibraryPageState extends State<LibraryPage> {
                 return PageView.builder(
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
+                    // Get the book data
                     Map<String, dynamic> data = snapshot.data!.docs[index]
                         .data() as Map<String, dynamic>;
                     return Center(
@@ -55,6 +59,7 @@ class _LibraryPageState extends State<LibraryPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            // Container to display book image
                             Container(
                               width: 340,
                               height: 250,
@@ -67,6 +72,7 @@ class _LibraryPageState extends State<LibraryPage> {
                               ),
                             ),
                             SizedBox(height: 60),
+                            // Container to display book title and read button
                             Container(
                               height: 159,
                               width: 340,
@@ -95,6 +101,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                         if (pdfUrl == null) {
                                           return;
                                         }
+                                        // Navigate to PDFViewerPage
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(

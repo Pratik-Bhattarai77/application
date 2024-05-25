@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+// BookInfoPage widget to display information about a specific book
 class BookInfoPage extends StatefulWidget {
   final String? bookId;
   const BookInfoPage({Key? key, this.bookId}) : super(key: key);
@@ -12,6 +13,7 @@ class BookInfoPage extends StatefulWidget {
   State<BookInfoPage> createState() => _BookInfoPageState();
 }
 
+// State class for BookInfoPage
 class _BookInfoPageState extends State<BookInfoPage> {
   String? _errorMessage;
   DocumentSnapshot? _bookDoc; // Store the specific book document
@@ -23,16 +25,17 @@ class _BookInfoPageState extends State<BookInfoPage> {
     fetchBookDetails();
   }
 
+  // Fetch book details from Firestore based on bookId
   Future<void> fetchBookDetails() async {
     try {
-      print("jkdfjdkfjkdsnfh: ${widget.bookId}");
+      print("Fetching book with ID: ${widget.bookId}");
       DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
           .collection('User')
           .doc('pOUxhmtf3E6I0e3jM0vG')
           .collection('books')
           .doc(widget.bookId)
           .get();
-      // .doc('9ivb6AN79kcNsHQsq0cw')
+      // Log the query path for debugging
       print("Query path: User/pOUxhmtf3E6I0e3jM0vG/books/${widget.bookId}");
 
       if (documentSnapshot.exists) {
@@ -59,6 +62,7 @@ class _BookInfoPageState extends State<BookInfoPage> {
       return Center(child: CircularProgressIndicator());
     }
 
+    // Cast the book document data to a Map
     Map<String, dynamic> data = _bookDoc!.data() as Map<String, dynamic>;
 
     return Scaffold(
@@ -77,6 +81,7 @@ class _BookInfoPageState extends State<BookInfoPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              // Display the book image
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Card(
@@ -114,6 +119,7 @@ class _BookInfoPageState extends State<BookInfoPage> {
                   ),
                 ),
               ),
+              // Display the book title and read button
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Container(
@@ -167,8 +173,7 @@ class _BookInfoPageState extends State<BookInfoPage> {
                               // Store the book data in the user-specific subcollection
                               final userBooks = FirebaseFirestore.instance
                                   .collection('User')
-                                  .doc(user
-                                      .uid) // Use the user's ID instead of a hardcoded value
+                                  .doc(user.uid) // Use the user's ID
                                   .collection('readBooks');
 
                               await userBooks.doc(data['id']).set(data);
